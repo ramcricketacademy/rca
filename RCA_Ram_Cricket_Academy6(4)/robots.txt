@@ -1,0 +1,12 @@
+# Robots.txt for Ram Cricket Academy (RCA) - https://ramcricketacademy.com
+# Ensures 100% crawlability for Google, Bing, Yahoo, DuckDuckGo, and AI Search Engines (ChatGPT, Perplexity, Gemini)
+
+User-agent: *
+Allow: /
+Allow: /assets/
+Allow: /css/
+Allow: /js/
+Disallow: /admin.html
+
+# Sitemap location
+Sitemap: https://ramcricketacademy.com/sitemap.xml

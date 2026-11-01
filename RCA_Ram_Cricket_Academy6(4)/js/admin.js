@@ -642,7 +642,7 @@ function renderNewJoinyTable() {
                 <td>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         ${(b.photo || (b.formData && b.formData.playerPhoto)) ? `
-                            <img src="${b.photo || b.formData.playerPhoto}" alt="Photo" style="width: 38px; height: 46px; object-fit: cover; border-radius: 4px; border: 1.5px solid var(--admin-gold); flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.5);">
+                            <img src="${b.photo || b.formData.playerPhoto}" alt="Photo" onclick="openPlayerPhotoLightbox('${b.id}')" style="width: 38px; height: 46px; object-fit: cover; border-radius: 4px; border: 1.5px solid var(--admin-gold); flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.5); cursor: pointer;" title="Click to view full photo & download">
                         ` : `
                             <div style="width: 38px; height: 46px; background: rgba(212,175,55,0.1); border: 1px dashed rgba(212,175,55,0.4); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--admin-gold); flex-shrink: 0;">
                                 <i class="fa-solid fa-user" style="font-size: 0.85rem;"></i>
@@ -824,7 +824,7 @@ function renderTournamentRegsTable() {
                 <td>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         ${(b.photo || (b.formData && b.formData.playerPhoto)) ? `
-                            <img src="${b.photo || b.formData.playerPhoto}" alt="Photo" style="width: 38px; height: 46px; object-fit: cover; border-radius: 4px; border: 1.5px solid var(--admin-gold); flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.5);">
+                            <img src="${b.photo || b.formData.playerPhoto}" alt="Photo" onclick="openPlayerPhotoLightbox('${b.id}')" style="width: 38px; height: 46px; object-fit: cover; border-radius: 4px; border: 1.5px solid var(--admin-gold); flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.5); cursor: pointer;" title="Click to view full photo & download">
                         ` : ''}
                         <div>
                             <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">${escapeHtml(b.name)}</div>
@@ -1101,7 +1101,12 @@ function viewPlayerSlip(bookingId) {
                     <div class="pass-id">${b.id}</div>
                 </div>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    ${playerPhoto ? `<img src="${playerPhoto}" alt="Player Photo" style="width: 50px; height: 60px; object-fit: cover; border-radius: 6px; border: 1.5px solid var(--admin-gold);">` : ''}
+                    ${playerPhoto ? `
+                        <div style="text-align: center;">
+                            <img src="${playerPhoto}" alt="Player Photo" onclick="openPlayerPhotoLightbox('${b.id}')" style="width: 52px; height: 64px; object-fit: cover; border-radius: 6px; border: 1.5px solid var(--admin-gold); cursor: pointer; display: block;" title="Click to view full photo & download">
+                            <div style="font-size: 0.65rem; color: var(--admin-gold); margin-top: 2px; cursor: pointer;" onclick="openPlayerPhotoLightbox('${b.id}')"><i class="fa-solid fa-magnifying-glass-plus"></i> View</div>
+                        </div>
+                    ` : ''}
                     <img src="assets/images/logo.png" alt="RCA" style="width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--admin-gold);">
                 </div>
             </div>
@@ -1175,6 +1180,14 @@ function viewPlayerSlip(bookingId) {
                 </div>
             ` : ''}
 
+            ${playerPhoto ? `
+                <div style="margin-top: 14px; text-align: center; border-top: 1px dashed rgba(212, 175, 55, 0.3); padding-top: 12px;">
+                    <button type="button" class="btn btn-gold btn-sm" onclick="openPlayerPhotoLightbox('${b.id}')" style="display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-expand"></i> View Full Player Photo & Download
+                    </button>
+                </div>
+            ` : ''}
+
             <div style="margin-top: 12px; font-size: 0.75rem; color: #baa3d6;">
                 Recorded At: ${b.createdAt} • Ground: <a href="https://goo.gl/maps/JbRKLzuBDmZG7U68A" target="_blank" rel="noopener" style="color: #facc15; text-decoration: underline;">RCA Ground, Panigaon Raya Road, Vrindavan (Mathura)</a>
             </div>
@@ -1186,6 +1199,36 @@ function viewPlayerSlip(bookingId) {
 
 function viewRegistrationDetails(bookingId) {
     viewPlayerSlip(bookingId);
+}
+
+// -----------------------------------------------------------------------------
+// PLAYER PHOTO FULL LIGHTBOX & LOCAL DOWNLOAD (User Requested)
+// -----------------------------------------------------------------------------
+function openPlayerPhotoLightbox(bookingId) {
+    const bookings = window.rcaDB ? window.rcaDB.getBookings() : [];
+    const b = bookings.find(item => item.id === bookingId);
+    const photoSrc = b ? (b.photo || (b.formData && b.formData.playerPhoto)) : '';
+    if (!b || !photoSrc) {
+        alert("Is player ki photo available nahi hai.");
+        return;
+    }
+    const nameEl = document.getElementById('photoModalPlayerName');
+    const idEl = document.getElementById('photoModalRegId');
+    const imgEl = document.getElementById('photoModalImg');
+    const downloadBtn = document.getElementById('photoDownloadBtn');
+
+    if (nameEl) nameEl.textContent = `${b.name || 'Player'} (${b.category || b.bookingType || 'Photo'})`;
+    if (idEl) idEl.textContent = `Reg ID: ${b.id}${b.aadhaarNumber ? ' • Aadhaar: ' + b.aadhaarNumber : ''}`;
+    if (imgEl) imgEl.src = photoSrc;
+
+    if (downloadBtn) {
+        downloadBtn.href = photoSrc;
+        const cleanName = (b.name || 'Player').replace(/[^a-zA-Z0-9_-]/g, '_');
+        const cleanId = (b.id || '').replace(/[^a-zA-Z0-9_-]/g, '_');
+        downloadBtn.setAttribute('download', `${cleanName}_${cleanId}_passport_photo.jpg`);
+    }
+
+    showModal('playerPhotoModal');
 }
 
 function handleManualBooking(event) {

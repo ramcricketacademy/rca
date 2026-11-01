@@ -29,7 +29,7 @@ const DEFAULT_SETTINGS = {
     city: "Vrindavan",
     timings: "Morning: 6:00 AM - 10:00 AM | Evening: 4:00 PM - 8:00 PM",
     googleSheetWebhookUrl: "", // Google Apps Script Webhook URL for auto-saving bookings
-    slotUtrRequired: true,    // Admin policy toggle: UTR mandatory vs optional for slot bookings
+    slotUtrRequired: true,     // Admin policy toggle: UTR mandatory vs optional for slot bookings (Default: true)
     admissionFee: 1499,        // Official New Joiny Academy Admission Fee (Editable by Admin)
     upiId: "ramsports6072@ybl", // Official UPI ID for Academy & Slot Payments
     aboutBio: "With dedicated grassroots coaching and match mentorship since 2018, Coach R.K. Chauhan established Ram Cricket Academy (RCA) with a mission: to provide international-standard cricket infrastructure, floodlit turf grounds, and major tournaments like RRPL 2026 and the RAM SPORTS CUP in Vrindavan.",
@@ -41,7 +41,7 @@ const DEFAULT_SETTINGS = {
 // Default Booking / Inquiry Categories (Admin can add/edit price/delete from admin panel)
 const DEFAULT_BOOKING_TYPES = [
     { name: "RRPL Trial Registration", price: 1499, label: "Official Trial Fee" },
-    { name: "RAM SPORTS CUP 7th (Team Entry)", price: 15000, label: "Team Registration" },
+    { name: "RAM SPORTS CUP 7th (Team Entry)", price: 5000, label: "₹5,000 Advance (Non-Refundable) • Total Team Fee ₹15,000" },
     { name: "Turf Net Practice Slot", price: 2500, label: "2-Hour Slot" },
     { name: "Monthly Academy Admission", price: 1499, label: "Monthly Training" },
     { name: "Full Ground Match Booking", price: 6500, label: "Per Match" },
@@ -67,7 +67,7 @@ function normalizeBookingType(item) {
     } else if (str.toLowerCase().includes('rrpl') || str.toLowerCase().includes('trial registration')) {
         price = 1499;
     } else if (str.toLowerCase().includes('ram sports cup')) {
-        price = 15000;
+        price = 5000;
     } else if (str.toLowerCase().includes('turf net')) {
         price = 2500;
     } else if (str.toLowerCase().includes('monthly academy')) {
@@ -111,9 +111,9 @@ const DEFAULT_TOURNAMENTS = [
         title: "RAM SPORTS CUP - 7TH (Late. Arun Yadav G Memorial Cricket Tournament)",
         shortTag: "RAM SPORTS CUP 7TH",
         category: "U19 Championship",
-        trialFee: 0,
+        trialFee: 5000,
         teamFee: 15000,
-        feeLabel: "₹15,000 (Team Entry)",
+        feeLabel: "₹5,000 Advance (Non-Refundable)",
         dates: "04 Nov to 15 Nov 2026",
         status: "Registration Open",
         winnerPrize: "₹ 51,000",
@@ -124,7 +124,7 @@ const DEFAULT_TOURNAMENTS = [
         telecast: "White Ball Matches • Group U19",
         venue: "RCA Ground, Panigaon Raya Road, Vrindavan (Mathura)",
         poster: "assets/images/tournaments/ram-sports-cup-7th.jpg",
-        description: "Prestige Under-19 tournament organized by RCA Cricket Academy with white ball matches, silver coin toss, and handsome cash awards."
+        description: "Prestige Under-19 tournament organized by RCA Cricket Academy with white ball matches, silver coin toss, and handsome cash awards. Advance registration token: ₹5,000/- (Non-Refundable) to confirm team slot. Remaining ₹10,000 payable on match day."
     },
     {
         id: "tour-ram-sports-cup-memorial",
@@ -521,25 +521,46 @@ class RcaDataManager {
                 if (!data.tournaments || data.tournaments.length === 0) {
                     data.tournaments = DEFAULT_TOURNAMENTS;
                     changed = true;
+                } else {
+                    const ramCup = data.tournaments.find(t => t.id === 'tour-ram-sports-cup-7' || (t.title && t.title.includes('RAM SPORTS CUP')));
+                    if (ramCup && ramCup.feeLabel !== "₹5,000 Advance (Non-Refundable)") {
+                        ramCup.trialFee = 5000;
+                        ramCup.teamFee = 15000;
+                        ramCup.feeLabel = "₹5,000 Advance (Non-Refundable)";
+                        ramCup.description = "Prestige Under-19 tournament organized by RCA Cricket Academy with white ball matches, silver coin toss, and handsome cash awards. Advance registration token: ₹5,000/- (Non-Refundable) to confirm team slot. Remaining ₹10,000 payable on match day.";
+                        changed = true;
+                    }
+                }
+                if (data.bookingTypes) {
+                    const ramType = data.bookingTypes.find(t => {
+                        const n = typeof t === 'string' ? t : t.name;
+                        return n && n.toLowerCase().includes('ram sports cup');
+                    });
+                    if (ramType && typeof ramType === 'object' && ramType.price !== 5000) {
+                        ramType.price = 5000;
+                        ramType.label = "₹5,000 Advance (Non-Refundable) • Total Team Fee ₹15,000";
+                        changed = true;
+                    }
                 }
                 if (!data.slots || data.slots.length === 0) {
                     data.slots = DEFAULT_SLOTS;
                     changed = true;
                 } else {
-                    // Ensure every slot has personPrices map populated
+                    // Ensure every slot has correct personPrices map populated
                     data.slots.forEach(slot => {
-                        if (!slot.personPrices || Object.keys(slot.personPrices).length === 0) {
-                            const def = DEFAULT_SLOTS.find(ds => ds.id === slot.id || ds.title === slot.title);
+                        const def = DEFAULT_SLOTS.find(ds => ds.id === slot.id || (ds.title && slot.title && ds.title.toLowerCase().trim() === slot.title.toLowerCase().trim()));
+                        if (!slot.personPrices || Object.keys(slot.personPrices).length === 0 || (def && def.personPrices && slot.personPrices["1 Player (Individual Practice)"] >= (slot.price || 1500))) {
                             if (def && def.personPrices) {
                                 slot.personPrices = { ...def.personPrices };
                             } else {
                                 const base = slot.price || 1500;
                                 slot.personPrices = {
-                                    "1 Player (Individual Practice)": Math.round(base * 0.4),
-                                    "2 Players": Math.round(base * 0.6),
-                                    "3-5 Players (Net Group)": Math.round(base * 0.8),
-                                    "Full Team (11-15 Players)": base,
-                                    "Both Teams (22+ Players)": Math.round(base * 1.8)
+                                    "1 Player (Individual Practice)": Math.max(350, Math.round((base * 0.45) / 50) * 50),
+                                    "2 Players": Math.max(500, Math.round((base * 0.65) / 50) * 50),
+                                    "3-5 Players (Net Group)": Math.max(800, base),
+                                    "6-10 Players": Math.max(1200, Math.round((base * 1.4) / 50) * 50),
+                                    "Full Team (11-15 Players)": Math.max(1800, Math.round((base * 2.0) / 50) * 50),
+                                    "Both Teams (22+ Players)": Math.max(3000, Math.round((base * 3.2) / 50) * 50)
                                 };
                             }
                             changed = true;
@@ -926,7 +947,7 @@ class RcaDataManager {
 
     // Dynamic Tier Pricing: Get price for a specific slot & group size (1 Player, 2 Players, Full Team, etc.)
     getSlotPriceForTier(slotOrTitle, tierName) {
-        if (!slotOrTitle) return 1500;
+        if (!slotOrTitle) return 700;
         let slot = null;
         if (typeof slotOrTitle === 'object' && slotOrTitle.title) {
             slot = slotOrTitle;
@@ -936,24 +957,50 @@ class RcaDataManager {
             slot = slots.find(s => s.title && s.title.toLowerCase().trim() === searchTitle)
                 || slots.find(s => s.title && s.title.toLowerCase().includes(searchTitle));
         }
-        if (!slot) return 1500;
 
-        const prices = slot.personPrices || {};
+        // Always ensure personPrices is available, with solid fallback to DEFAULT_SLOTS
+        let prices = (slot && slot.personPrices) ? slot.personPrices : {};
+        if (Object.keys(prices).length === 0) {
+            const searchKey = slot ? (slot.id || slot.title) : String(slotOrTitle);
+            const defSlot = DEFAULT_SLOTS.find(ds => ds.id === searchKey || (slot && ds.title && slot.title && ds.title.toLowerCase().trim() === slot.title.toLowerCase().trim()))
+                || DEFAULT_SLOTS.find(ds => ds.title && String(slotOrTitle).toLowerCase().includes(ds.title.toLowerCase()));
+            if (defSlot && defSlot.personPrices) {
+                prices = defSlot.personPrices;
+                if (slot) slot.personPrices = { ...prices };
+            }
+        }
+
+        // 1. Exact match
         if (tierName && prices[tierName] !== undefined && !isNaN(parseInt(prices[tierName])) && parseInt(prices[tierName]) > 0) {
             return parseInt(prices[tierName]);
         }
 
-        // Fuzzy match in case string whitespace differs slightly
+        // 2. Fuzzy match
         if (tierName) {
             const tLower = tierName.toLowerCase();
             for (const [k, v] of Object.entries(prices)) {
-                if (k.toLowerCase() === tLower || tLower.includes(k.toLowerCase()) || k.toLowerCase().includes(tLower)) {
+                if (k.toLowerCase() === tLower || tLower.includes(k.toLowerCase()) || k.toLowerCase().includes(tLower) ||
+                    (tLower.includes('1 player') && k.toLowerCase().includes('1 player')) ||
+                    (tLower.includes('2 player') && k.toLowerCase().includes('2 player')) ||
+                    (tLower.includes('full team') && k.toLowerCase().includes('full team'))) {
                     if (!isNaN(parseInt(v)) && parseInt(v) > 0) return parseInt(v);
                 }
             }
         }
 
-        return parseInt(slot.price) || 1500;
+        // 3. Proportional tier ratio fallback based on base slot price if tierName is specified
+        const base = (slot && slot.price) ? parseInt(slot.price) : 1500;
+        if (tierName) {
+            const t = tierName.toLowerCase();
+            if (t.includes('1 player')) return Math.max(350, Math.round((base * 0.45) / 50) * 50);
+            if (t.includes('2 player')) return Math.max(500, Math.round((base * 0.65) / 50) * 50);
+            if (t.includes('3-5') || t.includes('net group')) return Math.max(800, base);
+            if (t.includes('6-10')) return Math.max(1200, Math.round((base * 1.4) / 50) * 50);
+            if (t.includes('full team')) return Math.max(1800, Math.round((base * 2.0) / 50) * 50);
+            if (t.includes('both teams')) return Math.max(3000, Math.round((base * 3.2) / 50) * 50);
+        }
+
+        return base;
     }
 
     // Update single tier price for a specific slot
@@ -1064,31 +1111,20 @@ class RcaDataManager {
     }
 
     // Admin Policy: Toggle whether UTR is mandatory or optional for practice slots
-   // updateSlotUtrPolicy(isMandatory) {
-      //  const data = this.getRawData();
-        //if (!data) return false;
-        //if (!data.settings) data.settings = {};
-        //data.settings.slotUtrRequired = Boolean(isMandatory);
-        //this.saveRawData(data);
-        //if (window.rcaSupabase && window.rcaSupabase.isConfigured()) {
-          //  window.rcaSupabase.updateSettings({ slot_utr_required: Boolean(isMandatory) }).catch(e => console.warn(e));
-        //}
-        //return true;
-    //}
     updateSlotUtrPolicy(isMandatory) {
-    const data = this.getRawData();
-    if (!data) return false;
-    if (!data.settings) data.settings = {};
-    data.settings.slotUtrRequired = Boolean(isMandatory);
-    this.saveRawData(data);
-    if (window.rcaSupabase && window.rcaSupabase.isConfigured()) {
-        window.rcaSupabase.updateSettings(data.settings).catch(e => console.warn(e));
+        const data = this.getRawData();
+        if (!data) return false;
+        if (!data.settings) data.settings = {};
+        data.settings.slotUtrRequired = Boolean(isMandatory);
+        this.saveRawData(data);
+        if (window.rcaSupabase && window.rcaSupabase.isConfigured()) {
+            window.rcaSupabase.updateSettings(data.settings).catch(e => console.warn(e));
+        }
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('rcaDataUpdated', { detail: { source: 'local', entity: 'slot_utr_policy' } }));
+        }
+        return true;
     }
-    if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('rcaDataUpdated', { detail: { source: 'local', entity: 'slot_utr_policy' } }));
-    }
-    return true;
-}
 
     isSlotUtrRequired() {
         const settings = this.getSettings();

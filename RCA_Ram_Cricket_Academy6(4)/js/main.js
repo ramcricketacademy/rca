@@ -1,32 +1,100 @@
 
+// Update UTR input labels, required attributes and placeholders dynamically based on Admin Policy
+function updateUtrPolicyUI() {
+    const isMandatory = window.rcaDB && window.rcaDB.isSlotUtrRequired ? window.rcaDB.isSlotUtrRequired() : false;
+
+    // 1. Popup Modal UTR Elements
+    const popupBadge = document.getElementById('popupSlotUtrReqBadge');
+    const popupInput = document.getElementById('popupPlayerUtr');
+    if (popupBadge) {
+        popupBadge.innerHTML = isMandatory 
+            ? '<span style="color: #ef4444; font-weight: 800;">* (Mandatory)</span>' 
+            : '<span style="color: #94a3b8; font-weight: 500;">(Optional)</span>';
+    }
+    if (popupInput) {
+        popupInput.required = isMandatory;
+        popupInput.placeholder = isMandatory 
+            ? "Enter 12-digit UTR (Mandatory for booking)" 
+            : "12-digit UTR (e.g. 4289XXXXXXXX)";
+    }
+
+    // 2. Inline Bottom Form UTR Elements
+    const inlineBadge = document.getElementById('inlineSlotUtrReqBadge');
+    const inlineInput = document.getElementById('playerUtr');
+    if (inlineBadge) {
+        inlineBadge.innerHTML = isMandatory 
+            ? '<span style="color: #ef4444; font-weight: 800;">* (Mandatory)</span>' 
+            : '<span style="color: #94a3b8; font-weight: 500;">(Optional)</span>';
+    }
+    if (inlineInput) {
+        inlineInput.required = isMandatory;
+        inlineInput.placeholder = isMandatory 
+            ? "Enter 12-digit UTR (Mandatory for booking)" 
+            : "12-digit UTR (e.g. 4289XXXXXXXX)";
+    }
+}
+
 // Synchronize Slot Payment Card with selected Slot's price, group tier & QR code
 function syncSlotPaymentCard(slotTitle, slotPrice, scope = 'popup', tierName = '') {
     const isMandatory = window.rcaDB && window.rcaDB.isSlotUtrRequired ? window.rcaDB.isSlotUtrRequired() : false;
     const slots = window.rcaDB ? window.rcaDB.getSlots() : [];
     
+    // Check if tournament or special event
+    const isRamSportsCup = /ram\s*sports\s*cup/i.test(slotTitle || '');
+    const isRrpl = /rrpl|radha\s*rani/i.test(slotTitle || '');
+
     // Find matching slot or fallback
-    let matchedSlot = slots.find(s => s.title && s.title.toLowerCase().trim() === (slotTitle || '').toLowerCase().trim());
-    if (!matchedSlot && slotTitle) {
-        matchedSlot = slots.find(s => s.title && s.title.toLowerCase().includes((slotTitle || '').toLowerCase()));
+    let matchedSlot = null;
+    if (!isRamSportsCup && !isRrpl) {
+        matchedSlot = slots.find(s => s.title && s.title.toLowerCase().trim() === (slotTitle || '').toLowerCase().trim());
+        if (!matchedSlot && slotTitle) {
+            matchedSlot = slots.find(s => s.title && s.title.toLowerCase().includes((slotTitle || '').toLowerCase()));
+        }
     }
 
-    let finalPrice = 1500;
-    if (slotPrice !== undefined && slotPrice !== null && !isNaN(parseInt(slotPrice)) && parseInt(slotPrice) > 0) {
-        finalPrice = parseInt(slotPrice);
-    } else if (matchedSlot) {
-        finalPrice = matchedSlot.price !== undefined ? matchedSlot.price : 1500;
-    } else if (window.rcaDB) {
-        const bTypes = window.rcaDB.getBookingTypes();
-        const bMatch = bTypes.find(t => t.name.toLowerCase() === (slotTitle || '').toLowerCase());
-        if (bMatch) finalPrice = bMatch.price;
+    let finalPrice = 500;
+    let feeText = '';
+    let finalTitle = matchedSlot ? matchedSlot.title : (slotTitle || 'Turf Net Practice Slot');
+
+    if (isRamSportsCup) {
+        finalPrice = 5000;
+        finalTitle = 'RAM SPORTS CUP 7th (Team Entry ₹15,000)';
+        feeText = '₹ 5,000/- Advance Fee (Non-Refundable)';
+    } else if (isRrpl) {
+        finalPrice = 1499;
+        finalTitle = 'RRPL 2026 Trial Registration';
+        feeText = '₹ 1,499/- Official Trial Fee';
+    } else {
+        if (slotPrice !== undefined && slotPrice !== null && !isNaN(parseInt(slotPrice)) && parseInt(slotPrice) > 0) {
+            finalPrice = parseInt(slotPrice);
+        } else if (matchedSlot && window.rcaDB && window.rcaDB.getSlotPriceForTier) {
+            finalPrice = window.rcaDB.getSlotPriceForTier(matchedSlot, tierName || '1 Player (Individual Practice)');
+        } else if (matchedSlot) {
+            finalPrice = matchedSlot.price !== undefined ? matchedSlot.price : 700;
+        } else if (window.rcaDB) {
+            const bTypes = window.rcaDB.getBookingTypes();
+            const bMatch = bTypes.find(t => t.name.toLowerCase() === (slotTitle || '').toLowerCase());
+            if (bMatch) finalPrice = bMatch.price;
+        }
+
+        if (tierName && tierName.trim()) {
+            feeText = `₹ ${finalPrice.toLocaleString('en-IN')}/- (${tierName})`;
+        } else {
+            feeText = finalPrice > 0 ? `₹ ${finalPrice.toLocaleString('en-IN')}/- Official Fee` : `Complimentary / Free Inquiry`;
+        }
     }
 
-    const finalTitle = matchedSlot ? matchedSlot.title : (slotTitle || 'Turf Net Practice Slot');
-    const qrUrl = window.rcaDB && window.rcaDB.getSlotQrUrl 
-        ? window.rcaDB.getSlotQrUrl(matchedSlot, finalPrice, tierName) 
-        : `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent('upi://pay?pa=ramsports6072@ybl&am=' + finalPrice + '.00&pn=Ram%20Sports%20Academy&tn=' + encodeURIComponent(finalTitle + (tierName ? ' - ' + tierName : '')))}`;
-    const upiPayHref = `upi://pay?pa=ramsports6072@ybl&pn=Ram%20Sports%20Academy&am=${finalPrice}.00&cu=INR&tn=${encodeURIComponent(finalTitle + (tierName ? ' - ' + tierName : ''))}`;
-    const feeText = finalPrice > 0 ? `₹ ${finalPrice.toLocaleString('en-IN')}/- Official Fee` : `Complimentary / Free Inquiry`;
+    const noteText = isRamSportsCup 
+        ? 'RAM SPORTS CUP 7th Advance Fee (Non-Refundable)' 
+        : `${finalTitle}${tierName ? ' - ' + tierName : ''}`;
+
+    const qrUrl = (isRamSportsCup || isRrpl)
+        ? `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent('upi://pay?pa=ramsports6072@ybl&am=' + finalPrice + '.00&pn=Ram%20Sports%20Academy&tn=' + encodeURIComponent(noteText))}`
+        : (window.rcaDB && window.rcaDB.getSlotQrUrl 
+            ? window.rcaDB.getSlotQrUrl(matchedSlot, finalPrice, tierName) 
+            : `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent('upi://pay?pa=ramsports6072@ybl&am=' + finalPrice + '.00&pn=Ram%20Sports%20Academy&tn=' + encodeURIComponent(noteText))}`);
+
+    const upiPayHref = `upi://pay?pa=ramsports6072@ybl&pn=Ram%20Sports%20Academy&am=${finalPrice}.00&cu=INR&tn=${encodeURIComponent(noteText)}`;
 
     if (scope === 'popup' || scope === 'both') {
         const titleEl = document.getElementById('popupSlotTitleDisplay');
@@ -41,12 +109,14 @@ function syncSlotPaymentCard(slotTitle, slotPrice, scope = 'popup', tierName = '
         if (qrEl) qrEl.src = qrUrl;
         if (btnEl) btnEl.href = upiPayHref;
         if (utrBadgeEl) {
-            utrBadgeEl.textContent = isMandatory ? '* Mandatory' : '(Optional)';
-            utrBadgeEl.style.color = isMandatory ? '#facc15' : '#94a3b8';
-            utrBadgeEl.style.fontWeight = isMandatory ? '800' : '500';
-        }
-        if (utrInput) {
-            utrInput.required = isMandatory;
+            const forceMandatory = isRamSportsCup || isMandatory;
+            utrBadgeEl.innerHTML = forceMandatory 
+                ? '<span style="color: #ef4444; font-weight: 800;">* (Mandatory)</span>' 
+                : '<span style="color: #94a3b8; font-weight: 500;">(Optional)</span>';
+            if (utrInput) {
+                utrInput.required = forceMandatory;
+                utrInput.placeholder = forceMandatory ? "Enter 12-digit UTR (Mandatory for booking)" : "12-digit UTR (e.g. 4289XXXXXXXX)";
+            }
         }
     }
 
@@ -63,12 +133,14 @@ function syncSlotPaymentCard(slotTitle, slotPrice, scope = 'popup', tierName = '
         if (qrEl) qrEl.src = qrUrl;
         if (btnEl) btnEl.href = upiPayHref;
         if (utrBadgeEl) {
-            utrBadgeEl.textContent = isMandatory ? '* Mandatory' : '(Optional)';
-            utrBadgeEl.style.color = isMandatory ? '#facc15' : '#94a3b8';
-            utrBadgeEl.style.fontWeight = isMandatory ? '800' : '500';
-        }
-        if (utrInput) {
-            utrInput.required = isMandatory;
+            const forceMandatory = isRamSportsCup || isMandatory;
+            utrBadgeEl.innerHTML = forceMandatory 
+                ? '<span style="color: #ef4444; font-weight: 800;">* (Mandatory)</span>' 
+                : '<span style="color: #94a3b8; font-weight: 500;">(Optional)</span>';
+            if (utrInput) {
+                utrInput.required = forceMandatory;
+                utrInput.placeholder = forceMandatory ? "Enter 12-digit UTR (Mandatory for booking)" : "12-digit UTR (e.g. 4289XXXXXXXX)";
+            }
         }
     }
 }
@@ -92,6 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCommittee();
     renderSponsors();
     renderAboutProfile();
+    updateUtrPolicyUI();
 
     // Live update when Supabase Cloud syncs
     window.addEventListener('rcaDataUpdated', () => {
@@ -105,6 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCommittee();
         renderSponsors();
         renderAboutProfile();
+        updateUtrPolicyUI();
     });
 
     // Fetch freshest cloud data from Supabase immediately on load
@@ -363,39 +437,114 @@ function handleBookingTypeSelectionChange(selectedName, scope = 'both') {
     const matchedSlot = slots.find(s => s.title && s.title.toLowerCase().trim() === (selectedName || '').toLowerCase().trim())
         || slots.find(s => s.title && s.title.toLowerCase().includes((selectedName || '').toLowerCase().trim()));
 
-    const price = matched ? (matched.price || 0) : (matchedSlot ? matchedSlot.price : 0);
-    const label = matched ? (matched.label || '') : (matchedSlot ? (matchedSlot.facility || 'Ground Practice') : '');
-    const name = matched ? matched.name : (matchedSlot ? matchedSlot.title : (selectedName || 'General Practice'));
+    const isRamSportsCup = /ram\s*sports\s*cup/i.test(selectedName || '');
+    const isRrpl = /rrpl|radha\s*rani/i.test(selectedName || '');
 
-    const priceBoxHtml = (price > 0)
-        ? `
-            <div style="background: rgba(212, 175, 55, 0.12); border: 1.5px solid var(--gold); border-radius: 8px; padding: 10px 14px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <div>
-                    <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; letter-spacing: 0.5px;">Official Academy Fee</div>
-                    <div style="font-size: 1.15rem; font-weight: 800; color: #fff;">₹${price.toLocaleString('en-IN')}/- ${label ? `<span style="font-size: 0.8rem; font-weight: normal; color: #cbd5e1;">(${escapeHtml(label)})</span>` : ''}</div>
-                </div>
-                <div style="text-align: right;">
-                    <span style="display: inline-block; background: #22c55e; color: #000; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 12px;"><i class="fa-solid fa-qrcode"></i> UPI QR Ready</span>
-                </div>
-            </div>
-          `
-        : `
-            <div style="background: rgba(59, 130, 246, 0.12); border: 1px solid #3b82f6; border-radius: 8px; padding: 8px 12px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between;">
-                <span style="color: #93c5fd; font-size: 0.82rem;"><i class="fa-solid fa-circle-info"></i> Consultation / Free Session inquiry. Pay later at academy ground.</span>
-                <span style="background: #3b82f6; color: #fff; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 12px;">FREE / ON CALL</span>
-            </div>
-          `;
+    const popupPersonsEl = document.getElementById('popupTotalPersons');
+    const inlinePersonsEl = document.getElementById('totalPersons');
+
+    const getDetailsForScope = (currentScope) => {
+        const tierEl = currentScope === 'popup' ? popupPersonsEl : inlinePersonsEl;
+        const currentTier = (tierEl && tierEl.value) ? tierEl.value : '1 Player (Individual Practice)';
+
+        if (isRamSportsCup) {
+            return {
+                price: 5000,
+                label: 'Advance Registration Fee (Non-Refundable) • Total Team Fee ₹15,000',
+                name: 'RAM SPORTS CUP 7th (Team Entry ₹15,000)',
+                tier: 'Advance Token (Non-Refundable)',
+                heading: 'Advance Registration Fee (Non-Refundable)'
+            };
+        }
+        if (isRrpl) {
+            return {
+                price: 1499,
+                label: 'Official Trial Fee',
+                name: 'RRPL 2026 Trial Registration',
+                tier: 'Trial Registration',
+                heading: 'Official Trial Fee'
+            };
+        }
+        if (matchedSlot) {
+            const tieredPrice = (window.rcaDB && window.rcaDB.getSlotPriceForTier) 
+                ? window.rcaDB.getSlotPriceForTier(matchedSlot, currentTier) 
+                : (matchedSlot.price || 1500);
+            return {
+                price: tieredPrice,
+                label: currentTier,
+                name: matchedSlot.title,
+                tier: currentTier,
+                heading: 'Official Academy Fee'
+            };
+        }
+        if (matched) {
+            return {
+                price: matched.price || 0,
+                label: matched.label || '',
+                name: matched.name,
+                tier: matched.label || '',
+                heading: 'Official Academy Fee'
+            };
+        }
+        return {
+            price: 1500,
+            label: currentTier,
+            name: selectedName || 'General Practice',
+            tier: currentTier,
+            heading: 'Official Academy Fee'
+        };
+    };
 
     if (scope === 'inline' || scope === 'both') {
+        const details = getDetailsForScope('inline');
         const box = document.getElementById('inlineBookingTypePriceBox');
-        if (box) box.innerHTML = priceBoxHtml;
-        syncSlotPaymentCard(name, price, 'inline');
+        if (box) {
+            box.innerHTML = (details.price > 0)
+                ? `
+                    <div style="background: rgba(212, 175, 55, 0.12); border: 1.5px solid var(--gold); border-radius: 8px; padding: 10px 14px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                        <div>
+                            <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; letter-spacing: 0.5px;">${details.heading}</div>
+                            <div style="font-size: 1.15rem; font-weight: 800; color: #fff;">₹${details.price.toLocaleString('en-IN')}/- ${details.label ? `<span style="font-size: 0.8rem; font-weight: normal; color: #cbd5e1;">(${escapeHtml(details.label)})</span>` : ''}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="display: inline-block; background: #22c55e; color: #000; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 12px;"><i class="fa-solid fa-qrcode"></i> UPI QR Ready</span>
+                        </div>
+                    </div>
+                  `
+                : `
+                    <div style="background: rgba(59, 130, 246, 0.12); border: 1px solid #3b82f6; border-radius: 8px; padding: 8px 12px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="color: #93c5fd; font-size: 0.82rem;"><i class="fa-solid fa-circle-info"></i> Consultation / Free Session inquiry. Pay later at academy ground.</span>
+                        <span style="background: #3b82f6; color: #fff; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 12px;">FREE / ON CALL</span>
+                    </div>
+                  `;
+        }
+        syncSlotPaymentCard(details.name, details.price, 'inline', details.tier);
     }
 
     if (scope === 'popup' || scope === 'both') {
+        const details = getDetailsForScope('popup');
         const box = document.getElementById('popupBookingTypePriceBox');
-        if (box) box.innerHTML = priceBoxHtml;
-        syncSlotPaymentCard(name, price, 'popup');
+        if (box) {
+            box.innerHTML = (details.price > 0)
+                ? `
+                    <div style="background: rgba(212, 175, 55, 0.12); border: 1.5px solid var(--gold); border-radius: 8px; padding: 10px 14px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                        <div>
+                            <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; letter-spacing: 0.5px;">${details.heading}</div>
+                            <div style="font-size: 1.15rem; font-weight: 800; color: #fff;">₹${details.price.toLocaleString('en-IN')}/- ${details.label ? `<span style="font-size: 0.8rem; font-weight: normal; color: #cbd5e1;">(${escapeHtml(details.label)})</span>` : ''}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="display: inline-block; background: #22c55e; color: #000; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 12px;"><i class="fa-solid fa-qrcode"></i> UPI QR Ready</span>
+                        </div>
+                    </div>
+                  `
+                : `
+                    <div style="background: rgba(59, 130, 246, 0.12); border: 1px solid #3b82f6; border-radius: 8px; padding: 8px 12px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="color: #93c5fd; font-size: 0.82rem;"><i class="fa-solid fa-circle-info"></i> Consultation / Free Session inquiry. Pay later at academy ground.</span>
+                        <span style="background: #3b82f6; color: #fff; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 12px;">FREE / ON CALL</span>
+                    </div>
+                  `;
+        }
+        syncSlotPaymentCard(details.name, details.price, 'popup', details.tier);
     }
 }
 
@@ -454,14 +603,22 @@ function handlePopupTotalPersonsChange(newTier) {
     const slotTitle = document.getElementById('popupBookingType')?.value || '';
     if (!slotTitle || !window.rcaDB) return;
 
+    const isRamSportsCup = /ram\s*sports\s*cup/i.test(slotTitle || '');
+    if (isRamSportsCup) return; // Tournaments have fixed advance token ₹5,000
+
     const tierPrice = window.rcaDB.getSlotPriceForTier ? window.rcaDB.getSlotPriceForTier(slotTitle, newTier) : 1500;
 
     const priceBox = document.getElementById('popupBookingTypePriceBox');
     if (priceBox) {
         priceBox.innerHTML = `
-            <div style="margin-top: 6px; padding: 6px 12px; background: rgba(212, 175, 55, 0.12); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 6px; font-size: 0.85rem; color: #ffd700; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
-                <i class="fa-solid fa-tag"></i> Booking Rate: ₹${tierPrice.toLocaleString('en-IN')}/-
-                <span style="font-size: 0.78rem; font-weight: normal; color: #fef08a;">(${escapeHtml(newTier)})</span>
+            <div style="background: rgba(212, 175, 55, 0.12); border: 1.5px solid var(--gold); border-radius: 8px; padding: 10px 14px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <div>
+                    <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; letter-spacing: 0.5px;">Official Academy Fee</div>
+                    <div style="font-size: 1.15rem; font-weight: 800; color: #fff;">₹${tierPrice.toLocaleString('en-IN')}/- <span style="font-size: 0.8rem; font-weight: normal; color: #cbd5e1;">(${escapeHtml(newTier)})</span></div>
+                </div>
+                <div style="text-align: right;">
+                    <span style="display: inline-block; background: #22c55e; color: #000; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 12px;"><i class="fa-solid fa-qrcode"></i> UPI QR Ready</span>
+                </div>
             </div>
         `;
     }
@@ -474,14 +631,22 @@ function handleInlineTotalPersonsChange(newTier) {
     const slotTitle = document.getElementById('bookingType')?.value || '';
     if (!slotTitle || !window.rcaDB) return;
 
+    const isRamSportsCup = /ram\s*sports\s*cup/i.test(slotTitle || '');
+    if (isRamSportsCup) return;
+
     const tierPrice = window.rcaDB.getSlotPriceForTier ? window.rcaDB.getSlotPriceForTier(slotTitle, newTier) : 1500;
 
     const priceBox = document.getElementById('inlineBookingTypePriceBox');
     if (priceBox) {
         priceBox.innerHTML = `
-            <div style="margin-top: 6px; padding: 6px 12px; background: rgba(212, 175, 55, 0.12); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 6px; font-size: 0.85rem; color: #ffd700; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
-                <i class="fa-solid fa-tag"></i> Booking Rate: ₹${tierPrice.toLocaleString('en-IN')}/-
-                <span style="font-size: 0.78rem; font-weight: normal; color: #fef08a;">(${escapeHtml(newTier)})</span>
+            <div style="background: rgba(212, 175, 55, 0.12); border: 1.5px solid var(--gold); border-radius: 8px; padding: 10px 14px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <div>
+                    <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; letter-spacing: 0.5px;">Official Academy Fee</div>
+                    <div style="font-size: 1.15rem; font-weight: 800; color: #fff;">₹${tierPrice.toLocaleString('en-IN')}/- <span style="font-size: 0.8rem; font-weight: normal; color: #cbd5e1;">(${escapeHtml(newTier)})</span></div>
+                </div>
+                <div style="text-align: right;">
+                    <span style="display: inline-block; background: #22c55e; color: #000; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 12px;"><i class="fa-solid fa-qrcode"></i> UPI QR Ready</span>
+                </div>
             </div>
         `;
     }
@@ -492,6 +657,9 @@ function handleInlineTotalPersonsChange(newTier) {
 // -----------------------------------------------------------------------------
 // BOOKING POPUP MODAL (User Requested: Strict Heading Only for Ground Bookings)
 // -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// BOOKING POPUP MODAL (Dedicated Tournament Registration & Dynamic Practice Slot Tiers)
+// -----------------------------------------------------------------------------
 function openBookingModal(prefillType = '', prefillTime = '') {
     initDateInputs();
     renderPersonTierDropdowns();
@@ -501,60 +669,145 @@ function openBookingModal(prefillType = '', prefillTime = '') {
     const popupPersons = document.getElementById('popupTotalPersons');
     const allSlots = window.rcaDB ? window.rcaDB.getSlots() : [];
 
-    let matchedSlot = null;
-    if (prefillType) {
-        matchedSlot = allSlots.find(s => s.title && s.title.toLowerCase().trim() === prefillType.toLowerCase().trim())
-                   || allSlots.find(s => s.title && s.title.toLowerCase().includes(prefillType.toLowerCase()));
-    }
+    const isRamSportsCup = /ram\s*sports\s*cup/i.test(prefillType || '');
+    const isRrpl = /rrpl|radha\s*rani/i.test(prefillType || '');
+    const isTournament = isRamSportsCup || isRrpl || /tournament|championship|cup/i.test(prefillType || '');
 
-    const slotTitle = matchedSlot ? matchedSlot.title : prefillType;
-    const baseSlotPrice = matchedSlot ? matchedSlot.price : 1500;
-    const slotTime = prefillTime || (matchedSlot ? matchedSlot.time : '06:30 AM - 08:30 AM');
-    const activeTiers = window.rcaDB && window.rcaDB.getPersonTiers ? window.rcaDB.getPersonTiers() : [];
-    const selectedTier = (popupPersons && popupPersons.value) ? popupPersons.value : (activeTiers[0] || '1 Player (Individual Practice)');
-    if (popupPersons && !popupPersons.value) {
-        popupPersons.value = selectedTier;
-    }
-    const effectivePrice = window.rcaDB && window.rcaDB.getSlotPriceForTier 
-        ? window.rcaDB.getSlotPriceForTier(slotTitle, selectedTier) 
-        : baseSlotPrice;
+    // UI elements
+    const modalPillEl = document.getElementById('popupModalPill');
+    const modalTitleEl = document.getElementById('popupModalTitle');
+    const modalDescEl = document.getElementById('popupModalDesc');
+    const nameLabel = document.getElementById('popupPlayerNameLabel');
+    const nameInput = document.getElementById('popupPlayerName');
+    const personsGroup = document.getElementById('popupTotalPersonsGroup');
+    const ageGroup = document.getElementById('popupPlayerAgeGroup');
+    const dateGroup = document.getElementById('popupSlotDateGroup');
+    const timeGroup = document.getElementById('popupCustomTimeGroup');
+    const remarksInput = document.getElementById('popupPlayerRemarks');
+    const submitBtn = document.getElementById('popupSubmitBtn');
+    const dateInput = document.getElementById('popupSlotDate');
+    const timeInput = document.getElementById('popupCustomTime');
 
-    if (popupBookingType) {
-        if (slotTitle) {
-            // User requested: "Ground booking me jo form open hoke aata hai usme se inquiry booking type me bahi likho jo ground booking ki heading hai eg. Afternoon Match Simulation, baki sab option hata do"
-            popupBookingType.innerHTML = `<option value="${escapeHtml(slotTitle)}" data-price="${effectivePrice}" selected>${escapeHtml(slotTitle)}</option>`;
+    if (isTournament) {
+        // -------------------------------------------------------------------------
+        // TOURNAMENT REGISTRATION MODE (User requested: Team Name, Phone, City, Requirements, UTR, Fee 5000)
+        // -------------------------------------------------------------------------
+        if (modalPillEl) modalPillEl.textContent = 'TOURNAMENT REGISTRATION';
+        if (modalTitleEl) modalTitleEl.innerHTML = 'RAM SPORTS CUP 7th / <span class="gold-text">Team Entry</span>';
+        if (modalDescEl) modalDescEl.innerHTML = 'Register your team below. Advance registration token is <strong style="color: #22c55e;">₹5,000/- (Non-Refundable)</strong> to lock your team slot. Remaining ₹10,000 due on match day (Total Team Fee: ₹15,000).';
+
+        if (nameLabel) nameLabel.innerHTML = '<i class="fa-solid fa-users-gear"></i> Team Name *';
+        if (nameInput) nameInput.placeholder = 'e.g. Mathura Warriors / Vrindavan Strikers';
+
+        // Hide slot-specific fields
+        if (personsGroup) personsGroup.style.display = 'none';
+        if (ageGroup) ageGroup.style.display = 'none';
+        if (dateGroup) dateGroup.style.display = 'none';
+        if (timeGroup) timeGroup.style.display = 'none';
+        if (dateInput) { dateInput.required = false; dateInput.value = '2026-11-04'; }
+        if (timeInput) { timeInput.required = false; timeInput.value = 'Match Day Schedule'; }
+        if (remarksInput) remarksInput.placeholder = 'Captain name, squad details, jersey color or special requirements...';
+
+        if (submitBtn) submitBtn.innerHTML = '<i class="fa-solid fa-trophy"></i> Confirm Team Registration (₹5,000 Advance)';
+
+        const slotTitle = 'RAM SPORTS CUP 7th (Team Entry ₹15,000)';
+        if (popupBookingType) {
+            popupBookingType.innerHTML = `<option value="${escapeHtml(slotTitle)}" data-price="5000" selected>${escapeHtml(slotTitle)}</option>`;
             popupBookingType.value = slotTitle;
-        } else {
-            // General open without prefill: Only show Ground Booking practice slots (Never tournaments or admissions!)
-            if (allSlots.length > 0) {
-                popupBookingType.innerHTML = allSlots.map(s => 
-                    `<option value="${escapeHtml(s.title)}" data-price="${s.price}">${escapeHtml(s.title)} (₹${s.price.toLocaleString('en-IN')})</option>`
-                ).join('');
-                matchedSlot = allSlots[0];
+        }
+
+        const priceBox = document.getElementById('popupBookingTypePriceBox');
+        if (priceBox) {
+            priceBox.innerHTML = `
+                <div style="background: rgba(212, 175, 55, 0.12); border: 1.5px solid var(--gold); border-radius: 8px; padding: 10px 14px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <div>
+                        <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; letter-spacing: 0.5px;">Advance Registration Fee (Non-Refundable)</div>
+                        <div style="font-size: 1.15rem; font-weight: 800; color: #fff;">₹5,000/- <span style="font-size: 0.8rem; font-weight: normal; color: #cbd5e1;">(Advance Token • Total Team Fee ₹15,000)</span></div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="display: inline-block; background: #22c55e; color: #000; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 12px;"><i class="fa-solid fa-qrcode"></i> ₹5,000 QR Ready</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        syncSlotPaymentCard(slotTitle, 5000, 'popup', 'Advance Token (Non-Refundable)');
+    } else {
+        // -------------------------------------------------------------------------
+        // GROUND / PRACTICE SLOT BOOKING MODE
+        // -------------------------------------------------------------------------
+        if (modalPillEl) modalPillEl.textContent = 'ONLINE RESERVATION';
+        if (modalTitleEl) modalTitleEl.innerHTML = 'Book Slot / <span class="gold-text">Registration</span>';
+        if (modalDescEl) modalDescEl.textContent = 'Fill out the form below. Confirmation alert is sent immediately to Coach R.K. Chauhan.';
+
+        if (nameLabel) nameLabel.innerHTML = '<i class="fa-solid fa-user"></i> Player Full Name *';
+        if (nameInput) nameInput.placeholder = 'e.g. Vikramaditya Singh';
+
+        // Show slot booking fields
+        if (personsGroup) personsGroup.style.display = '';
+        if (ageGroup) ageGroup.style.display = '';
+        if (dateGroup) dateGroup.style.display = '';
+        if (timeGroup) timeGroup.style.display = '';
+        if (dateInput) dateInput.required = true;
+        if (timeInput) timeInput.required = true;
+        if (remarksInput) remarksInput.placeholder = 'Batting/bowling preferences, gear requirements, or club details...';
+
+        if (submitBtn) submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Confirm Booking';
+
+        let matchedSlot = null;
+        if (prefillType) {
+            matchedSlot = allSlots.find(s => s.title && s.title.toLowerCase().trim() === prefillType.toLowerCase().trim())
+                       || allSlots.find(s => s.title && s.title.toLowerCase().includes(prefillType.toLowerCase()));
+        }
+        if (!matchedSlot && allSlots.length > 0) {
+            matchedSlot = allSlots[0];
+        }
+
+        const slotTitle = matchedSlot ? matchedSlot.title : (prefillType || 'Morning Early Bird Turf Wicket');
+        const activeTiers = window.rcaDB && window.rcaDB.getPersonTiers ? window.rcaDB.getPersonTiers() : [];
+        const selectedTier = (popupPersons && popupPersons.value) ? popupPersons.value : (activeTiers[0] || '1 Player (Individual Practice)');
+        if (popupPersons && !popupPersons.value) {
+            popupPersons.value = selectedTier;
+        }
+
+        const effectivePrice = window.rcaDB && window.rcaDB.getSlotPriceForTier 
+            ? window.rcaDB.getSlotPriceForTier(matchedSlot || slotTitle, selectedTier) 
+            : 700;
+
+        const slotTime = prefillTime || (matchedSlot ? matchedSlot.time : '06:30 AM - 08:30 AM');
+
+        if (popupBookingType) {
+            if (matchedSlot) {
+                popupBookingType.innerHTML = `<option value="${escapeHtml(slotTitle)}" data-price="${effectivePrice}" selected>${escapeHtml(slotTitle)}</option>`;
+                popupBookingType.value = slotTitle;
             } else {
                 renderBookingTypeDropdowns();
             }
         }
+
+        if (popupCustomTime) {
+            popupCustomTime.value = slotTime && !slotTime.toLowerCase().includes('flexible') ? slotTime : '06:30 AM - 08:30 AM';
+        }
+
+        const priceBox = document.getElementById('popupBookingTypePriceBox');
+        if (priceBox) {
+            priceBox.innerHTML = `
+                <div style="background: rgba(212, 175, 55, 0.12); border: 1.5px solid var(--gold); border-radius: 8px; padding: 10px 14px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <div>
+                        <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; letter-spacing: 0.5px;">Official Academy Fee</div>
+                        <div style="font-size: 1.15rem; font-weight: 800; color: #fff;">₹${effectivePrice.toLocaleString('en-IN')}/- <span style="font-size: 0.8rem; font-weight: normal; color: #cbd5e1;">(${escapeHtml(selectedTier)})</span></div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="display: inline-block; background: #22c55e; color: #000; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 12px;"><i class="fa-solid fa-qrcode"></i> UPI QR Ready</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        syncSlotPaymentCard(slotTitle, effectivePrice, 'popup', selectedTier);
     }
 
-    if (popupCustomTime) {
-        popupCustomTime.value = slotTime && !slotTime.toLowerCase().includes('flexible') ? slotTime : '06:30 AM - 08:30 AM';
-    }
-
-    const priceBox = document.getElementById('popupBookingTypePriceBox');
-    if (priceBox) {
-        priceBox.innerHTML = `
-            <div style="margin-top: 6px; padding: 6px 12px; background: rgba(212, 175, 55, 0.12); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 6px; font-size: 0.85rem; color: #ffd700; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
-                <i class="fa-solid fa-tag"></i> Booking Rate: ₹${effectivePrice.toLocaleString('en-IN')}/-
-                <span style="font-size: 0.78rem; font-weight: normal; color: #fef08a;">(${escapeHtml(selectedTier)})</span>
-            </div>
-        `;
-    }
-
-    syncSlotPaymentCard(slotTitle, effectivePrice, 'popup', selectedTier);
     showModal('slotBookingModal');
-
-    const nameInput = document.getElementById('popupPlayerName');
     if (nameInput) setTimeout(() => nameInput.focus(), 300);
 }
 
@@ -565,17 +818,17 @@ function handlePopupBookingSubmit(event) {
 
     const name = document.getElementById('popupPlayerName').value.trim();
     const phone = document.getElementById('popupPlayerPhone').value.trim();
-    const totalPersons = document.getElementById('popupTotalPersons').value;
-    const age = document.getElementById('popupPlayerAge') ? document.getElementById('popupPlayerAge').value.trim() : "";
-    const bookingType = document.getElementById('popupBookingType').value;
-    const slotDate = document.getElementById('popupSlotDate').value;
-    const customTime = document.getElementById('popupCustomTime').value.trim();
     const city = document.getElementById('popupPlayerCity').value.trim();
     const remarks = document.getElementById('popupPlayerRemarks').value.trim();
     const utr = (document.getElementById('popupPlayerUtr')?.value || '').trim();
+    const bookingType = document.getElementById('popupBookingType').value;
 
-    if (!name || !phone || !slotDate) {
-        alert("Please fill in all required fields!");
+    const isRamSportsCup = /ram\s*sports\s*cup/i.test(bookingType || '');
+    const isRrpl = /rrpl|radha\s*rani/i.test(bookingType || '');
+    const isTournament = isRamSportsCup || isRrpl || /tournament|championship|cup/i.test(bookingType || '');
+
+    if (!name || !phone) {
+        alert(isTournament ? "Please enter Team Name and Contact Number!" : "Please fill in all required fields!");
         return;
     }
 
@@ -587,16 +840,64 @@ function handlePopupBookingSubmit(event) {
         return;
     }
 
-    // 1. Mandatory UTR check for all ₹1,499 Trial / Admission selections
-    const is1499 = bookingType.includes('1499') || bookingType.includes('1,499') || bookingType.includes('RRPL') || bookingType.includes('Admission');
-    if (is1499 && !utr) {
-        alert("Please complete the payment and enter your 12-digit UPI UTR number to complete registration.");
-        const uInput = document.getElementById('popupPlayerUtr');
-        if (uInput) { uInput.focus(); uInput.style.borderColor = "#ef4444"; }
+    if (isTournament) {
+        // Tournament: UTR is strictly mandatory for the ₹5,000 advance token
+        if (!utr) {
+            alert("Please complete the ₹5,000/- advance payment via UPI QR and enter your 12-digit UTR number to lock your team's tournament slot.");
+            const uInput = document.getElementById('popupPlayerUtr');
+            if (uInput) { uInput.focus(); uInput.style.borderColor = "#ef4444"; }
+            return;
+        }
+
+        const bookingInput = {
+            name: name, // Team Name
+            age: "U-19",
+            fatherName: "-",
+            phone: phone,
+            email: dynamic.email || "",
+            city: city || "Vrindavan",
+            role: "Tournament Team / Captain",
+            totalPersons: "Team Entry (15 Players)",
+            bookingType: "RAM SPORTS CUP 7th (Team Entry ₹15,000)",
+            slotDate: "2026-11-04",
+            timeSlot: "Match Schedule (04 Nov - 15 Nov)",
+            facilityType: "RCA Tournament Ground",
+            remarks: remarks ? `${remarks} (Advance Token ₹5,000/- Paid. Remaining ₹10,000 payable on match day)` : "Advance Token ₹5,000/- Paid via UPI. Remaining ₹10,000 payable on match day.",
+            formType: 'tournament_registration',
+            category: 'U19 Tournament',
+            utrNumber: utr,
+            feeAmount: '5000',
+            paymentStatus: 'Pending Verification',
+            formData: { utrNumber: utr, teamName: name, ...(dynamic.formData || {}) }
+        };
+
+        const savedBooking = window.rcaDB.addBooking(bookingInput);
+        if (savedBooking) {
+            closeModal('slotBookingModal');
+            displayPassModal(savedBooking, "TOURNAMENT TEAM ENTRY PASS");
+            document.getElementById('popupBookingForm').reset();
+            const errEl = document.getElementById('popupPlayerPhoneError');
+            if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+            initDateInputs();
+            document.getElementById('popupPlayerCity').value = 'Vrindavan';
+        } else {
+            alert("There was an issue saving your tournament registration. Please call Coach Chauhan directly at +91 9897517704.");
+        }
         return;
     }
 
-    // 2. Check Admin Policy: whether slot booking UTR is mandatory
+    // Normal practice slot booking flow:
+    const totalPersons = document.getElementById('popupTotalPersons')?.value || '1 Player (Individual Practice)';
+    const age = document.getElementById('popupPlayerAge') ? document.getElementById('popupPlayerAge').value.trim() : "";
+    const slotDate = document.getElementById('popupSlotDate')?.value || '';
+    const customTime = (document.getElementById('popupCustomTime')?.value || '').trim();
+
+    if (!slotDate) {
+        alert("Please select your preferred date for practice.");
+        return;
+    }
+
+    // Check Admin Policy: whether slot booking UTR is mandatory
     const isSlotUtrMandatory = window.rcaDB && window.rcaDB.isSlotUtrRequired ? window.rcaDB.isSlotUtrRequired() : false;
     if (isSlotUtrMandatory && !utr) {
         alert("Academy Policy: Please complete the payment and enter your UPI UTR number to reserve this practice slot.");
@@ -604,12 +905,14 @@ function handlePopupBookingSubmit(event) {
         if (uInput) { uInput.focus(); uInput.style.borderColor = "#ef4444"; }
         return;
     }
+
     const allSlots = window.rcaDB ? window.rcaDB.getSlots() : [];
     const matchedSlot = allSlots.find(s => s.title && s.title.toLowerCase().trim() === bookingType.toLowerCase().trim())
                      || allSlots.find(s => s.title && s.title.toLowerCase().includes(bookingType.toLowerCase()));
+
     const finalFee = (matchedSlot && window.rcaDB && window.rcaDB.getSlotPriceForTier) 
         ? String(window.rcaDB.getSlotPriceForTier(matchedSlot, totalPersons)) 
-        : (document.getElementById('popupSlotFeeBadge')?.innerText?.replace(/\D/g, '') || (is1499 ? '1499' : '1500'));
+        : (document.getElementById('popupSlotFeeBadge')?.innerText?.replace(/\D/g, '') || '700');
 
     const bookingInput = {
         name,
@@ -837,13 +1140,18 @@ function selectTournamentBooking(tournamentTitle) {
         inferredType = 'RRPL Trial Registration (₹1,499)';
     }
 
-    openBookingModal(inferredType, 'Morning Batch');
+    openBookingModal(inferredType, 'Match Day Batch');
 
     // Also update bottom inline form if user scrolls down
     const inlineType = document.getElementById('bookingType');
     const inlineRemarks = document.getElementById('playerRemarks');
-    if (inlineType) inlineType.value = inferredType;
-    if (inlineRemarks) inlineRemarks.value = `Registering for: ${tournamentTitle}.`;
+    if (inlineType) {
+        inlineType.value = inferredType;
+        handleBookingTypeSelectionChange(inferredType, 'inline');
+    }
+    if (inlineRemarks) {
+        inlineRemarks.value = `Registering for: ${tournamentTitle}. Advance Registration Fee: ₹5,000/- (Non-Refundable). Total Team Fee: ₹15,000.`;
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -926,7 +1234,7 @@ function selectSlot(title, time) {
     const slotPrice = matched ? matched.price : 1500;
     const slotTime = time && !time.toLowerCase().includes('flexible') ? time : (matched ? matched.time : '06:30 AM - 08:30 AM');
 
-    // Open popup directly with matching QR & rate and ONLY this heading (All other options eliminated)
+    // Open popup directly with matching QR & rate for 1 Player (or selected tier)
     openBookingModal(slotTitle, slotTime);
 
     // Also update bottom inline form in case user scrolls down
@@ -947,7 +1255,6 @@ function selectSlot(title, time) {
         inlineType.value = slotTitle;
         handleBookingTypeSelectionChange(slotTitle, 'inline');
     }
-    syncSlotPaymentCard(slotTitle, slotPrice, 'both');
 }
 
 // -----------------------------------------------------------------------------

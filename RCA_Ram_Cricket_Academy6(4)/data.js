@@ -41,7 +41,7 @@ const DEFAULT_SETTINGS = {
 // Default Booking / Inquiry Categories (Admin can add/edit price/delete from admin panel)
 const DEFAULT_BOOKING_TYPES = [
     { name: "RRPL Trial Registration", price: 1499, label: "Official Trial Fee" },
-    { name: "RAM SPORTS CUP 7th (Team Entry)", price: 15000, label: "Team Registration" },
+    { name: "RAM SPORTS CUP 7th (Team Entry)", price: 5000, label: "₹5,000 Advance (Non-Refundable) • Total Team Fee ₹15,000" },
     { name: "Turf Net Practice Slot", price: 2500, label: "2-Hour Slot" },
     { name: "Monthly Academy Admission", price: 1499, label: "Monthly Training" },
     { name: "Full Ground Match Booking", price: 6500, label: "Per Match" },
@@ -67,7 +67,7 @@ function normalizeBookingType(item) {
     } else if (str.toLowerCase().includes('rrpl') || str.toLowerCase().includes('trial registration')) {
         price = 1499;
     } else if (str.toLowerCase().includes('ram sports cup')) {
-        price = 15000;
+        price = 5000;
     } else if (str.toLowerCase().includes('turf net')) {
         price = 2500;
     } else if (str.toLowerCase().includes('monthly academy')) {
@@ -111,9 +111,9 @@ const DEFAULT_TOURNAMENTS = [
         title: "RAM SPORTS CUP - 7TH (Late. Arun Yadav G Memorial Cricket Tournament)",
         shortTag: "RAM SPORTS CUP 7TH",
         category: "U19 Championship",
-        trialFee: 0,
+        trialFee: 5000,
         teamFee: 15000,
-        feeLabel: "₹15,000 (Team Entry)",
+        feeLabel: "₹5,000 Advance (Non-Refundable)",
         dates: "04 Nov to 15 Nov 2026",
         status: "Registration Open",
         winnerPrize: "₹ 51,000",
@@ -124,7 +124,7 @@ const DEFAULT_TOURNAMENTS = [
         telecast: "White Ball Matches • Group U19",
         venue: "RCA Ground, Panigaon Raya Road, Vrindavan (Mathura)",
         poster: "assets/images/tournaments/ram-sports-cup-7th.jpg",
-        description: "Prestige Under-19 tournament organized by RCA Cricket Academy with white ball matches, silver coin toss, and handsome cash awards."
+        description: "Prestige Under-19 tournament organized by RCA Cricket Academy with white ball matches, silver coin toss, and handsome cash awards. Advance registration token: ₹5,000/- (Non-Refundable) to confirm team slot. Remaining ₹10,000 payable on match day."
     },
     {
         id: "tour-ram-sports-cup-memorial",
@@ -521,6 +521,26 @@ class RcaDataManager {
                 if (!data.tournaments || data.tournaments.length === 0) {
                     data.tournaments = DEFAULT_TOURNAMENTS;
                     changed = true;
+                } else {
+                    const ramCup = data.tournaments.find(t => t.id === 'tour-ram-sports-cup-7' || (t.title && t.title.includes('RAM SPORTS CUP')));
+                    if (ramCup && ramCup.feeLabel !== "₹5,000 Advance (Non-Refundable)") {
+                        ramCup.trialFee = 5000;
+                        ramCup.teamFee = 15000;
+                        ramCup.feeLabel = "₹5,000 Advance (Non-Refundable)";
+                        ramCup.description = "Prestige Under-19 tournament organized by RCA Cricket Academy with white ball matches, silver coin toss, and handsome cash awards. Advance registration token: ₹5,000/- (Non-Refundable) to confirm team slot. Remaining ₹10,000 payable on match day.";
+                        changed = true;
+                    }
+                }
+                if (data.bookingTypes) {
+                    const ramType = data.bookingTypes.find(t => {
+                        const n = typeof t === 'string' ? t : t.name;
+                        return n && n.toLowerCase().includes('ram sports cup');
+                    });
+                    if (ramType && typeof ramType === 'object' && ramType.price !== 5000) {
+                        ramType.price = 5000;
+                        ramType.label = "₹5,000 Advance (Non-Refundable) • Total Team Fee ₹15,000";
+                        changed = true;
+                    }
                 }
                 if (!data.slots || data.slots.length === 0) {
                     data.slots = DEFAULT_SLOTS;

@@ -39,29 +39,60 @@ function syncSlotPaymentCard(slotTitle, slotPrice, scope = 'popup', tierName = '
     const isMandatory = window.rcaDB && window.rcaDB.isSlotUtrRequired ? window.rcaDB.isSlotUtrRequired() : false;
     const slots = window.rcaDB ? window.rcaDB.getSlots() : [];
     
+    // Check if tournament or special event
+    const isRamSportsCup = /ram\s*sports\s*cup/i.test(slotTitle || '');
+    const isRrpl = /rrpl|radha\s*rani/i.test(slotTitle || '');
+
     // Find matching slot or fallback
-    let matchedSlot = slots.find(s => s.title && s.title.toLowerCase().trim() === (slotTitle || '').toLowerCase().trim());
-    if (!matchedSlot && slotTitle) {
-        matchedSlot = slots.find(s => s.title && s.title.toLowerCase().includes((slotTitle || '').toLowerCase()));
+    let matchedSlot = null;
+    if (!isRamSportsCup && !isRrpl) {
+        matchedSlot = slots.find(s => s.title && s.title.toLowerCase().trim() === (slotTitle || '').toLowerCase().trim());
+        if (!matchedSlot && slotTitle) {
+            matchedSlot = slots.find(s => s.title && s.title.toLowerCase().includes((slotTitle || '').toLowerCase()));
+        }
     }
 
     let finalPrice = 1500;
-    if (slotPrice !== undefined && slotPrice !== null && !isNaN(parseInt(slotPrice)) && parseInt(slotPrice) > 0) {
-        finalPrice = parseInt(slotPrice);
-    } else if (matchedSlot) {
-        finalPrice = matchedSlot.price !== undefined ? matchedSlot.price : 1500;
-    } else if (window.rcaDB) {
-        const bTypes = window.rcaDB.getBookingTypes();
-        const bMatch = bTypes.find(t => t.name.toLowerCase() === (slotTitle || '').toLowerCase());
-        if (bMatch) finalPrice = bMatch.price;
+    let feeText = '';
+    let finalTitle = matchedSlot ? matchedSlot.title : (slotTitle || 'Turf Net Practice Slot');
+
+    if (isRamSportsCup) {
+        finalPrice = 5000;
+        finalTitle = 'RAM SPORTS CUP 7th (Team Entry ₹15,000)';
+        feeText = '₹ 5,000/- Advance Fee (Non-Refundable)';
+    } else if (isRrpl) {
+        finalPrice = 1499;
+        finalTitle = 'RRPL 2026 Trial Registration';
+        feeText = '₹ 1,499/- Official Trial Fee';
+    } else {
+        if (slotPrice !== undefined && slotPrice !== null && !isNaN(parseInt(slotPrice)) && parseInt(slotPrice) > 0) {
+            finalPrice = parseInt(slotPrice);
+        } else if (matchedSlot) {
+            finalPrice = matchedSlot.price !== undefined ? matchedSlot.price : 1500;
+        } else if (window.rcaDB) {
+            const bTypes = window.rcaDB.getBookingTypes();
+            const bMatch = bTypes.find(t => t.name.toLowerCase() === (slotTitle || '').toLowerCase());
+            if (bMatch) finalPrice = bMatch.price;
+        }
+
+        if (tierName && tierName.trim()) {
+            feeText = `₹ ${finalPrice.toLocaleString('en-IN')}/- (${tierName})`;
+        } else {
+            feeText = finalPrice > 0 ? `₹ ${finalPrice.toLocaleString('en-IN')}/- Official Fee` : `Complimentary / Free Inquiry`;
+        }
     }
 
-    const finalTitle = matchedSlot ? matchedSlot.title : (slotTitle || 'Turf Net Practice Slot');
-    const qrUrl = window.rcaDB && window.rcaDB.getSlotQrUrl 
-        ? window.rcaDB.getSlotQrUrl(matchedSlot, finalPrice, tierName) 
-        : `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent('upi://pay?pa=ramsports6072@ybl&am=' + finalPrice + '.00&pn=Ram%20Sports%20Academy&tn=' + encodeURIComponent(finalTitle + (tierName ? ' - ' + tierName : '')))}`;
-    const upiPayHref = `upi://pay?pa=ramsports6072@ybl&pn=Ram%20Sports%20Academy&am=${finalPrice}.00&cu=INR&tn=${encodeURIComponent(finalTitle + (tierName ? ' - ' + tierName : ''))}`;
-    const feeText = finalPrice > 0 ? `₹ ${finalPrice.toLocaleString('en-IN')}/- Official Fee` : `Complimentary / Free Inquiry`;
+    const noteText = isRamSportsCup 
+        ? 'RAM SPORTS CUP 7th Advance Fee (Non-Refundable)' 
+        : `${finalTitle}${tierName ? ' - ' + tierName : ''}`;
+
+    const qrUrl = (isRamSportsCup || isRrpl)
+        ? `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent('upi://pay?pa=ramsports6072@ybl&am=' + finalPrice + '.00&pn=Ram%20Sports%20Academy&tn=' + encodeURIComponent(noteText))}`
+        : (window.rcaDB && window.rcaDB.getSlotQrUrl 
+            ? window.rcaDB.getSlotQrUrl(matchedSlot, finalPrice, tierName) 
+            : `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent('upi://pay?pa=ramsports6072@ybl&am=' + finalPrice + '.00&pn=Ram%20Sports%20Academy&tn=' + encodeURIComponent(noteText))}`);
+
+    const upiPayHref = `upi://pay?pa=ramsports6072@ybl&pn=Ram%20Sports%20Academy&am=${finalPrice}.00&cu=INR&tn=${encodeURIComponent(noteText)}`;
 
     if (scope === 'popup' || scope === 'both') {
         const titleEl = document.getElementById('popupSlotTitleDisplay');
@@ -402,39 +433,114 @@ function handleBookingTypeSelectionChange(selectedName, scope = 'both') {
     const matchedSlot = slots.find(s => s.title && s.title.toLowerCase().trim() === (selectedName || '').toLowerCase().trim())
         || slots.find(s => s.title && s.title.toLowerCase().includes((selectedName || '').toLowerCase().trim()));
 
-    const price = matched ? (matched.price || 0) : (matchedSlot ? matchedSlot.price : 0);
-    const label = matched ? (matched.label || '') : (matchedSlot ? (matchedSlot.facility || 'Ground Practice') : '');
-    const name = matched ? matched.name : (matchedSlot ? matchedSlot.title : (selectedName || 'General Practice'));
+    const isRamSportsCup = /ram\s*sports\s*cup/i.test(selectedName || '');
+    const isRrpl = /rrpl|radha\s*rani/i.test(selectedName || '');
 
-    const priceBoxHtml = (price > 0)
-        ? `
-            <div style="background: rgba(212, 175, 55, 0.12); border: 1.5px solid var(--gold); border-radius: 8px; padding: 10px 14px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <div>
-                    <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; letter-spacing: 0.5px;">Official Academy Fee</div>
-                    <div style="font-size: 1.15rem; font-weight: 800; color: #fff;">₹${price.toLocaleString('en-IN')}/- ${label ? `<span style="font-size: 0.8rem; font-weight: normal; color: #cbd5e1;">(${escapeHtml(label)})</span>` : ''}</div>
-                </div>
-                <div style="text-align: right;">
-                    <span style="display: inline-block; background: #22c55e; color: #000; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 12px;"><i class="fa-solid fa-qrcode"></i> UPI QR Ready</span>
-                </div>
-            </div>
-          `
-        : `
-            <div style="background: rgba(59, 130, 246, 0.12); border: 1px solid #3b82f6; border-radius: 8px; padding: 8px 12px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between;">
-                <span style="color: #93c5fd; font-size: 0.82rem;"><i class="fa-solid fa-circle-info"></i> Consultation / Free Session inquiry. Pay later at academy ground.</span>
-                <span style="background: #3b82f6; color: #fff; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 12px;">FREE / ON CALL</span>
-            </div>
-          `;
+    const popupPersonsEl = document.getElementById('popupTotalPersons');
+    const inlinePersonsEl = document.getElementById('totalPersons');
+
+    const getDetailsForScope = (currentScope) => {
+        const tierEl = currentScope === 'popup' ? popupPersonsEl : inlinePersonsEl;
+        const currentTier = (tierEl && tierEl.value) ? tierEl.value : '1 Player (Individual Practice)';
+
+        if (isRamSportsCup) {
+            return {
+                price: 5000,
+                label: 'Advance Registration Fee (Non-Refundable) • Total Team Fee ₹15,000',
+                name: 'RAM SPORTS CUP 7th (Team Entry ₹15,000)',
+                tier: 'Advance Token (Non-Refundable)',
+                heading: 'Advance Registration Fee (Non-Refundable)'
+            };
+        }
+        if (isRrpl) {
+            return {
+                price: 1499,
+                label: 'Official Trial Fee',
+                name: 'RRPL 2026 Trial Registration',
+                tier: 'Trial Registration',
+                heading: 'Official Trial Fee'
+            };
+        }
+        if (matchedSlot) {
+            const tieredPrice = (window.rcaDB && window.rcaDB.getSlotPriceForTier) 
+                ? window.rcaDB.getSlotPriceForTier(matchedSlot, currentTier) 
+                : (matchedSlot.price || 1500);
+            return {
+                price: tieredPrice,
+                label: currentTier,
+                name: matchedSlot.title,
+                tier: currentTier,
+                heading: 'Official Academy Fee'
+            };
+        }
+        if (matched) {
+            return {
+                price: matched.price || 0,
+                label: matched.label || '',
+                name: matched.name,
+                tier: matched.label || '',
+                heading: 'Official Academy Fee'
+            };
+        }
+        return {
+            price: 1500,
+            label: currentTier,
+            name: selectedName || 'General Practice',
+            tier: currentTier,
+            heading: 'Official Academy Fee'
+        };
+    };
 
     if (scope === 'inline' || scope === 'both') {
+        const details = getDetailsForScope('inline');
         const box = document.getElementById('inlineBookingTypePriceBox');
-        if (box) box.innerHTML = priceBoxHtml;
-        syncSlotPaymentCard(name, price, 'inline');
+        if (box) {
+            box.innerHTML = (details.price > 0)
+                ? `
+                    <div style="background: rgba(212, 175, 55, 0.12); border: 1.5px solid var(--gold); border-radius: 8px; padding: 10px 14px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                        <div>
+                            <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; letter-spacing: 0.5px;">${details.heading}</div>
+                            <div style="font-size: 1.15rem; font-weight: 800; color: #fff;">₹${details.price.toLocaleString('en-IN')}/- ${details.label ? `<span style="font-size: 0.8rem; font-weight: normal; color: #cbd5e1;">(${escapeHtml(details.label)})</span>` : ''}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="display: inline-block; background: #22c55e; color: #000; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 12px;"><i class="fa-solid fa-qrcode"></i> UPI QR Ready</span>
+                        </div>
+                    </div>
+                  `
+                : `
+                    <div style="background: rgba(59, 130, 246, 0.12); border: 1px solid #3b82f6; border-radius: 8px; padding: 8px 12px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="color: #93c5fd; font-size: 0.82rem;"><i class="fa-solid fa-circle-info"></i> Consultation / Free Session inquiry. Pay later at academy ground.</span>
+                        <span style="background: #3b82f6; color: #fff; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 12px;">FREE / ON CALL</span>
+                    </div>
+                  `;
+        }
+        syncSlotPaymentCard(details.name, details.price, 'inline', details.tier);
     }
 
     if (scope === 'popup' || scope === 'both') {
+        const details = getDetailsForScope('popup');
         const box = document.getElementById('popupBookingTypePriceBox');
-        if (box) box.innerHTML = priceBoxHtml;
-        syncSlotPaymentCard(name, price, 'popup');
+        if (box) {
+            box.innerHTML = (details.price > 0)
+                ? `
+                    <div style="background: rgba(212, 175, 55, 0.12); border: 1.5px solid var(--gold); border-radius: 8px; padding: 10px 14px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                        <div>
+                            <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; letter-spacing: 0.5px;">${details.heading}</div>
+                            <div style="font-size: 1.15rem; font-weight: 800; color: #fff;">₹${details.price.toLocaleString('en-IN')}/- ${details.label ? `<span style="font-size: 0.8rem; font-weight: normal; color: #cbd5e1;">(${escapeHtml(details.label)})</span>` : ''}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="display: inline-block; background: #22c55e; color: #000; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 12px;"><i class="fa-solid fa-qrcode"></i> UPI QR Ready</span>
+                        </div>
+                    </div>
+                  `
+                : `
+                    <div style="background: rgba(59, 130, 246, 0.12); border: 1px solid #3b82f6; border-radius: 8px; padding: 8px 12px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="color: #93c5fd; font-size: 0.82rem;"><i class="fa-solid fa-circle-info"></i> Consultation / Free Session inquiry. Pay later at academy ground.</span>
+                        <span style="background: #3b82f6; color: #fff; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 12px;">FREE / ON CALL</span>
+                    </div>
+                  `;
+        }
+        syncSlotPaymentCard(details.name, details.price, 'popup', details.tier);
     }
 }
 
@@ -493,14 +599,22 @@ function handlePopupTotalPersonsChange(newTier) {
     const slotTitle = document.getElementById('popupBookingType')?.value || '';
     if (!slotTitle || !window.rcaDB) return;
 
+    const isRamSportsCup = /ram\s*sports\s*cup/i.test(slotTitle || '');
+    if (isRamSportsCup) return; // Tournaments have fixed advance token ₹5,000
+
     const tierPrice = window.rcaDB.getSlotPriceForTier ? window.rcaDB.getSlotPriceForTier(slotTitle, newTier) : 1500;
 
     const priceBox = document.getElementById('popupBookingTypePriceBox');
     if (priceBox) {
         priceBox.innerHTML = `
-            <div style="margin-top: 6px; padding: 6px 12px; background: rgba(212, 175, 55, 0.12); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 6px; font-size: 0.85rem; color: #ffd700; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
-                <i class="fa-solid fa-tag"></i> Booking Rate: ₹${tierPrice.toLocaleString('en-IN')}/-
-                <span style="font-size: 0.78rem; font-weight: normal; color: #fef08a;">(${escapeHtml(newTier)})</span>
+            <div style="background: rgba(212, 175, 55, 0.12); border: 1.5px solid var(--gold); border-radius: 8px; padding: 10px 14px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <div>
+                    <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; letter-spacing: 0.5px;">Official Academy Fee</div>
+                    <div style="font-size: 1.15rem; font-weight: 800; color: #fff;">₹${tierPrice.toLocaleString('en-IN')}/- <span style="font-size: 0.8rem; font-weight: normal; color: #cbd5e1;">(${escapeHtml(newTier)})</span></div>
+                </div>
+                <div style="text-align: right;">
+                    <span style="display: inline-block; background: #22c55e; color: #000; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 12px;"><i class="fa-solid fa-qrcode"></i> UPI QR Ready</span>
+                </div>
             </div>
         `;
     }
@@ -513,14 +627,22 @@ function handleInlineTotalPersonsChange(newTier) {
     const slotTitle = document.getElementById('bookingType')?.value || '';
     if (!slotTitle || !window.rcaDB) return;
 
+    const isRamSportsCup = /ram\s*sports\s*cup/i.test(slotTitle || '');
+    if (isRamSportsCup) return;
+
     const tierPrice = window.rcaDB.getSlotPriceForTier ? window.rcaDB.getSlotPriceForTier(slotTitle, newTier) : 1500;
 
     const priceBox = document.getElementById('inlineBookingTypePriceBox');
     if (priceBox) {
         priceBox.innerHTML = `
-            <div style="margin-top: 6px; padding: 6px 12px; background: rgba(212, 175, 55, 0.12); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 6px; font-size: 0.85rem; color: #ffd700; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
-                <i class="fa-solid fa-tag"></i> Booking Rate: ₹${tierPrice.toLocaleString('en-IN')}/-
-                <span style="font-size: 0.78rem; font-weight: normal; color: #fef08a;">(${escapeHtml(newTier)})</span>
+            <div style="background: rgba(212, 175, 55, 0.12); border: 1.5px solid var(--gold); border-radius: 8px; padding: 10px 14px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <div>
+                    <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; letter-spacing: 0.5px;">Official Academy Fee</div>
+                    <div style="font-size: 1.15rem; font-weight: 800; color: #fff;">₹${tierPrice.toLocaleString('en-IN')}/- <span style="font-size: 0.8rem; font-weight: normal; color: #cbd5e1;">(${escapeHtml(newTier)})</span></div>
+                </div>
+                <div style="text-align: right;">
+                    <span style="display: inline-block; background: #22c55e; color: #000; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 12px;"><i class="fa-solid fa-qrcode"></i> UPI QR Ready</span>
+                </div>
             </div>
         `;
     }
@@ -540,23 +662,55 @@ function openBookingModal(prefillType = '', prefillTime = '') {
     const popupPersons = document.getElementById('popupTotalPersons');
     const allSlots = window.rcaDB ? window.rcaDB.getSlots() : [];
 
+    const isRamSportsCup = /ram\s*sports\s*cup/i.test(prefillType || '');
+    const isRrpl = /rrpl|radha\s*rani/i.test(prefillType || '');
+
     let matchedSlot = null;
-    if (prefillType) {
+    if (prefillType && !isRamSportsCup && !isRrpl) {
         matchedSlot = allSlots.find(s => s.title && s.title.toLowerCase().trim() === prefillType.toLowerCase().trim())
                    || allSlots.find(s => s.title && s.title.toLowerCase().includes(prefillType.toLowerCase()));
     }
 
-    const slotTitle = matchedSlot ? matchedSlot.title : prefillType;
-    const baseSlotPrice = matchedSlot ? matchedSlot.price : 1500;
-    const slotTime = prefillTime || (matchedSlot ? matchedSlot.time : '06:30 AM - 08:30 AM');
+    if (!matchedSlot && !prefillType && allSlots.length > 0) {
+        matchedSlot = allSlots[0];
+    }
+
     const activeTiers = window.rcaDB && window.rcaDB.getPersonTiers ? window.rcaDB.getPersonTiers() : [];
     const selectedTier = (popupPersons && popupPersons.value) ? popupPersons.value : (activeTiers[0] || '1 Player (Individual Practice)');
     if (popupPersons && !popupPersons.value) {
         popupPersons.value = selectedTier;
     }
-    const effectivePrice = window.rcaDB && window.rcaDB.getSlotPriceForTier 
-        ? window.rcaDB.getSlotPriceForTier(slotTitle, selectedTier) 
-        : baseSlotPrice;
+
+    let slotTitle = '';
+    let effectivePrice = 1500;
+    let priceLabel = selectedTier;
+    let headingText = 'Official Academy Fee';
+
+    if (isRamSportsCup) {
+        slotTitle = 'RAM SPORTS CUP 7th (Team Entry ₹15,000)';
+        effectivePrice = 5000;
+        priceLabel = '₹5,000 Advance (Non-Refundable) • Total Team Fee ₹15,000';
+        headingText = 'Advance Registration Fee (Non-Refundable)';
+    } else if (isRrpl) {
+        slotTitle = 'RRPL Trial Registration (₹1,499)';
+        effectivePrice = 1499;
+        priceLabel = 'Official Trial Fee';
+        headingText = 'Official Trial Fee';
+    } else if (matchedSlot) {
+        slotTitle = matchedSlot.title;
+        effectivePrice = window.rcaDB && window.rcaDB.getSlotPriceForTier 
+            ? window.rcaDB.getSlotPriceForTier(matchedSlot, selectedTier) 
+            : (matchedSlot.price || 1500);
+        priceLabel = selectedTier;
+        headingText = 'Official Academy Fee';
+    } else {
+        slotTitle = prefillType || 'Turf Net Practice Slot';
+        effectivePrice = 1500;
+        priceLabel = selectedTier;
+        headingText = 'Official Academy Fee';
+    }
+
+    const slotTime = prefillTime || (matchedSlot ? matchedSlot.time : '06:30 AM - 08:30 AM');
 
     if (popupBookingType) {
         if (slotTitle) {
@@ -569,7 +723,6 @@ function openBookingModal(prefillType = '', prefillTime = '') {
                 popupBookingType.innerHTML = allSlots.map(s => 
                     `<option value="${escapeHtml(s.title)}" data-price="${s.price}">${escapeHtml(s.title)} (₹${s.price.toLocaleString('en-IN')})</option>`
                 ).join('');
-                matchedSlot = allSlots[0];
             } else {
                 renderBookingTypeDropdowns();
             }
@@ -583,14 +736,19 @@ function openBookingModal(prefillType = '', prefillTime = '') {
     const priceBox = document.getElementById('popupBookingTypePriceBox');
     if (priceBox) {
         priceBox.innerHTML = `
-            <div style="margin-top: 6px; padding: 6px 12px; background: rgba(212, 175, 55, 0.12); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 6px; font-size: 0.85rem; color: #ffd700; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
-                <i class="fa-solid fa-tag"></i> Booking Rate: ₹${effectivePrice.toLocaleString('en-IN')}/-
-                <span style="font-size: 0.78rem; font-weight: normal; color: #fef08a;">(${escapeHtml(selectedTier)})</span>
+            <div style="background: rgba(212, 175, 55, 0.12); border: 1.5px solid var(--gold); border-radius: 8px; padding: 10px 14px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <div>
+                    <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; letter-spacing: 0.5px;">${headingText}</div>
+                    <div style="font-size: 1.15rem; font-weight: 800; color: #fff;">₹${effectivePrice.toLocaleString('en-IN')}/- <span style="font-size: 0.8rem; font-weight: normal; color: #cbd5e1;">(${escapeHtml(priceLabel)})</span></div>
+                </div>
+                <div style="text-align: right;">
+                    <span style="display: inline-block; background: #22c55e; color: #000; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 12px;"><i class="fa-solid fa-qrcode"></i> UPI QR Ready</span>
+                </div>
             </div>
         `;
     }
 
-    syncSlotPaymentCard(slotTitle, effectivePrice, 'popup', selectedTier);
+    syncSlotPaymentCard(slotTitle, effectivePrice, 'popup', isRamSportsCup ? 'Advance Token (Non-Refundable)' : selectedTier);
     showModal('slotBookingModal');
 
     const nameInput = document.getElementById('popupPlayerName');
@@ -646,9 +804,18 @@ function handlePopupBookingSubmit(event) {
     const allSlots = window.rcaDB ? window.rcaDB.getSlots() : [];
     const matchedSlot = allSlots.find(s => s.title && s.title.toLowerCase().trim() === bookingType.toLowerCase().trim())
                      || allSlots.find(s => s.title && s.title.toLowerCase().includes(bookingType.toLowerCase()));
-    const finalFee = (matchedSlot && window.rcaDB && window.rcaDB.getSlotPriceForTier) 
-        ? String(window.rcaDB.getSlotPriceForTier(matchedSlot, totalPersons)) 
-        : (document.getElementById('popupSlotFeeBadge')?.innerText?.replace(/\D/g, '') || (is1499 ? '1499' : '1500'));
+    
+    const isRamSportsCup = /ram\s*sports\s*cup/i.test(bookingType || '');
+    let finalFee = '1500';
+    if (isRamSportsCup) {
+        finalFee = '5000';
+    } else if (matchedSlot && window.rcaDB && window.rcaDB.getSlotPriceForTier) {
+        finalFee = String(window.rcaDB.getSlotPriceForTier(matchedSlot, totalPersons));
+    } else if (is1499) {
+        finalFee = '1499';
+    } else {
+        finalFee = document.getElementById('popupSlotFeeBadge')?.innerText?.replace(/\D/g, '') || '1500';
+    }
 
     const bookingInput = {
         name,
@@ -876,13 +1043,18 @@ function selectTournamentBooking(tournamentTitle) {
         inferredType = 'RRPL Trial Registration (₹1,499)';
     }
 
-    openBookingModal(inferredType, 'Morning Batch');
+    openBookingModal(inferredType, 'Match Day Batch');
 
     // Also update bottom inline form if user scrolls down
     const inlineType = document.getElementById('bookingType');
     const inlineRemarks = document.getElementById('playerRemarks');
-    if (inlineType) inlineType.value = inferredType;
-    if (inlineRemarks) inlineRemarks.value = `Registering for: ${tournamentTitle}.`;
+    if (inlineType) {
+        inlineType.value = inferredType;
+        handleBookingTypeSelectionChange(inferredType, 'inline');
+    }
+    if (inlineRemarks) {
+        inlineRemarks.value = `Registering for: ${tournamentTitle}. Advance Registration Fee: ₹5,000/- (Non-Refundable). Total Team Fee: ₹15,000.`;
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -965,7 +1137,7 @@ function selectSlot(title, time) {
     const slotPrice = matched ? matched.price : 1500;
     const slotTime = time && !time.toLowerCase().includes('flexible') ? time : (matched ? matched.time : '06:30 AM - 08:30 AM');
 
-    // Open popup directly with matching QR & rate and ONLY this heading (All other options eliminated)
+    // Open popup directly with matching QR & rate for 1 Player (or selected tier)
     openBookingModal(slotTitle, slotTime);
 
     // Also update bottom inline form in case user scrolls down
@@ -986,7 +1158,6 @@ function selectSlot(title, time) {
         inlineType.value = slotTitle;
         handleBookingTypeSelectionChange(slotTitle, 'inline');
     }
-    syncSlotPaymentCard(slotTitle, slotPrice, 'both');
 }
 
 // -----------------------------------------------------------------------------

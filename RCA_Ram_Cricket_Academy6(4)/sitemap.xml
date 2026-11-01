@@ -26,9 +26,17 @@
     <!-- Contact & Directions Page -->
     <url>
         <loc>https://ramcricketacademy.com/contact-us.html</loc>
-        <lastmod>2026-10-24</lastmod>
+        <lastmod>2026-10-28</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
+    </url>
+
+    <!-- Dedicated RRPL 2026 Registration Page -->
+    <url>
+        <loc>https://ramcricketacademy.com/rrpl-registration.html</loc>
+        <lastmod>2026-10-28</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.95</priority>
     </url>
 
     <!-- Direct Anchor Links for Deep SEO Indexing -->

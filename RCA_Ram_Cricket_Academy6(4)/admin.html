@@ -69,9 +69,21 @@
             </div>
 
             <nav class="sidebar-menu">
-                <div class="menu-item active" data-view="bookingsView" onclick="switchView('bookingsView', this)">
-                    <i class="fa-solid fa-users"></i>
-                    <span>Slot Bookings</span>
+                <div class="menu-item active" data-view="newJoinyView" onclick="switchView('newJoinyView', this)">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>New Joiny & Admissions</span>
+                    <span class="menu-badge" id="sidebarNewJoinyBadge" style="background: linear-gradient(135deg, #10b981, #059669);">0</span>
+                </div>
+
+                <div class="menu-item" data-view="tournamentRegsView" onclick="switchView('tournamentRegsView', this)">
+                    <i class="fa-solid fa-medal"></i>
+                    <span>Tournament Entries</span>
+                    <span class="menu-badge" id="sidebarTournamentRegsBadge" style="background: linear-gradient(135deg, #eab308, #ca8a04); color: #000; font-weight: 800;">0</span>
+                </div>
+
+                <div class="menu-item" data-view="bookingsView" onclick="switchView('bookingsView', this)">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <span>Slot & Ground Bookings</span>
                     <span class="menu-badge" id="sidebarBookingBadge">0</span>
                 </div>
 
@@ -94,6 +106,11 @@
                 <div class="menu-item" data-view="noticesView" onclick="switchView('noticesView', this)">
                     <i class="fa-solid fa-bullhorn"></i>
                     <span>Announcements</span>
+                </div>
+
+                <div class="menu-item" data-view="aboutView" onclick="switchView('aboutView', this)">
+                    <i class="fa-solid fa-users-gear"></i>
+                    <span>About, Committee & Sponsors</span>
                 </div>
 
                 <div class="menu-item" data-view="settingsView" onclick="switchView('settingsView', this)">
@@ -124,7 +141,7 @@
                     <div class="admin-title">
                         <h2 id="topbarTitle">Slot Bookings & Registrations</h2>
                         <span class="topbar-location-sub" style="font-size: 0.8rem; color: var(--admin-gold-light);">
-                            <i class="fa-solid fa-location-dot"></i> Panigaon Raya Road & Garun Govind Ground, Vrindavan
+                            <i class="fa-solid fa-location-dot"></i> RCA Ground, Panigaon Raya Road, Vrindavan (Mathura)
                         </span>
                     </div>
                 </div>
@@ -144,55 +161,220 @@
 
             <!-- Metrics Summary Cards -->
             <section class="metrics-grid">
-                <div class="metric-card">
-                    <div class="metric-icon icon-purple">
-                        <i class="fa-solid fa-address-book"></i>
+                <div class="metric-card" onclick="switchView('newJoinyView')" style="cursor: pointer;">
+                    <div class="metric-icon icon-purple" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">
+                        <i class="fa-solid fa-graduation-cap"></i>
                     </div>
                     <div class="metric-data">
-                        <h4>Total Registrations</h4>
-                        <div class="metric-value" id="statTotal">0</div>
+                        <h4>New Joiny Admissions</h4>
+                        <div class="metric-value" id="statNewJoiny">0</div>
                     </div>
                 </div>
 
-                <div class="metric-card">
+                <div class="metric-card" onclick="switchView('tournamentRegsView')" style="cursor: pointer;">
+                    <div class="metric-icon icon-gold" style="background: rgba(234, 179, 8, 0.2); color: #fbbf24;">
+                        <i class="fa-solid fa-medal"></i>
+                    </div>
+                    <div class="metric-data">
+                        <h4>Tournament Entries</h4>
+                        <div class="metric-value" id="statTournamentRegs">0</div>
+                    </div>
+                </div>
+
+                <div class="metric-card" onclick="switchView('bookingsView')" style="cursor: pointer;">
                     <div class="metric-icon icon-blue">
-                        <i class="fa-solid fa-bell"></i>
+                        <i class="fa-solid fa-calendar-check"></i>
                     </div>
                     <div class="metric-data">
-                        <h4>New Inquiries</h4>
-                        <div class="metric-value" id="statNew">0</div>
+                        <h4>Slot Bookings</h4>
+                        <div class="metric-value" id="statSlotsCount">0</div>
                     </div>
                 </div>
 
                 <div class="metric-card">
-                    <div class="metric-icon icon-green">
-                        <i class="fa-solid fa-circle-check"></i>
+                    <div class="metric-icon icon-green" style="background: rgba(34, 197, 94, 0.2); color: #4ade80;">
+                        <i class="fa-solid fa-indian-rupee-sign"></i>
                     </div>
                     <div class="metric-data">
-                        <h4>Confirmed Players</h4>
-                        <div class="metric-value" id="statConfirmed">0</div>
-                    </div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-icon icon-gold">
-                        <i class="fa-solid fa-trophy"></i>
-                    </div>
-                    <div class="metric-data">
-                        <h4>Live Tournaments</h4>
-                        <div class="metric-value" id="statTournaments">3</div>
+                        <h4>Estimated Revenue</h4>
+                        <div class="metric-value" id="statAdmissionRevenue">₹0</div>
                     </div>
                 </div>
             </section>
 
             <!-- ================================================================= -->
-            <!-- VIEW 1: Slot Bookings & Registrations Manager                     -->
+            <!-- VIEW 1: New Joiny & Academy Admissions 2026 (User Requested)      -->
             <!-- ================================================================= -->
-            <section class="admin-view-panel active-view" id="bookingsView">
+            <section class="admin-view-panel active-view" id="newJoinyView">
+                <div class="table-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid rgba(212, 175, 55, 0.2);">
+                        <div>
+                            <span class="status-pill status-Confirmed" style="margin-bottom: 6px; display: inline-flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-graduation-cap"></i> Academy Admissions & RRPL Trials 2026
+                            </span>
+                            <h3 class="brand-font" style="color: var(--admin-gold-light); margin: 0; font-size: 1.3rem;">
+                                New Joiny & Player Registrations
+                            </h3>
+                            <p style="color: var(--admin-text-dim); font-size: 0.85rem; margin-top: 4px;">
+                                Dedicated management of Under-14, Under-16 & Under-19 admissions with ₹1,499 UPI UTR verification.
+                            </p>
+                        </div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button class="btn btn-gold btn-sm" onclick="showModal('manualBookingModal')">
+                                <i class="fa-solid fa-user-plus"></i> Add New Player
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="exportNewJoinyCSV()">
+                                <i class="fa-solid fa-file-excel"></i> Export New Joiny CSV
+                            </button>
+                            <button class="btn btn-purple btn-sm" onclick="triggerManualSheetSync()">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Sync to Sheet
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mini Stat Badges for New Joiny -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 16px;">
+                        <div style="background: rgba(12, 2, 20, 0.7); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; padding: 10px; text-align: center;">
+                            <div style="font-size: 0.75rem; color: #baa3d6;">Total Joinies</div>
+                            <div id="statNewJoinyTotal" style="font-size: 1.4rem; font-weight: 800; color: #fff;">0</div>
+                        </div>
+                        <div style="background: rgba(12, 2, 20, 0.7); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 8px; padding: 10px; text-align: center;">
+                            <div style="font-size: 0.75rem; color: #a7f3d0;">Under-14</div>
+                            <div id="statNewJoinyU14" style="font-size: 1.4rem; font-weight: 800; color: #4ade80;">0</div>
+                        </div>
+                        <div style="background: rgba(12, 2, 20, 0.7); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 10px; text-align: center;">
+                            <div style="font-size: 0.75rem; color: #bfdbfe;">Under-16</div>
+                            <div id="statNewJoinyU16" style="font-size: 1.4rem; font-weight: 800; color: #60a5fa;">0</div>
+                        </div>
+                        <div style="background: rgba(12, 2, 20, 0.7); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 8px; padding: 10px; text-align: center;">
+                            <div style="font-size: 0.75rem; color: #e9d5ff;">Under-19</div>
+                            <div id="statNewJoinyU19" style="font-size: 1.4rem; font-weight: 800; color: #c084fc;">0</div>
+                        </div>
+                        <div style="background: rgba(12, 2, 20, 0.7); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 10px; text-align: center;">
+                            <div style="font-size: 0.75rem; color: #fde68a;">Pending UTR</div>
+                            <div id="statNewJoinyPending" style="font-size: 1.4rem; font-weight: 800; color: #fbbf24;">0</div>
+                        </div>
+                    </div>
+
+                    <div class="table-controls">
+                        <!-- Search Box with Anti-Autofill & Clear Button -->
+                        <div style="position: relative; flex: 1; max-width: 380px;">
+                            <input type="search" id="newJoinySearchInput" class="search-box" style="width: 100%; padding-right: 32px;" placeholder="Search admission by name, phone, UTR..." autocomplete="chrome-off" autocorrect="off" autocapitalize="off" spellcheck="false" name="rca_search_admissions" readonly onfocus="this.removeAttribute('readonly')" oninput="handleNewJoinySearch()">
+                            <button type="button" onclick="clearSearchInput('newJoinySearchInput', 'newJoiny')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--admin-text-dim); cursor: pointer; font-size: 14px;" title="Clear Search">✕</button>
+                        </div>
+
+                        <!-- Category Filter Tabs -->
+                        <div class="filter-group">
+                            <button class="filter-btn active" onclick="filterNewJoinyTable('All', this)">All Categories</button>
+                            <button class="filter-btn" onclick="filterNewJoinyTable('Under-14', this)">Under-14</button>
+                            <button class="filter-btn" onclick="filterNewJoinyTable('Under-16', this)">Under-16</button>
+                            <button class="filter-btn" onclick="filterNewJoinyTable('Under-19', this)">Under-19</button>
+                            <button class="filter-btn" onclick="filterNewJoinyTable('Confirmed', this)">Confirmed</button>
+                            <button class="filter-btn" onclick="filterNewJoinyTable('Pending', this)">Pending UTR</button>
+                        </div>
+                    </div>
+
+                    <!-- Table Scroll Hint for Mobile Screens -->
+                    <div class="table-scroll-hint">
+                        <i class="fa-solid fa-arrows-left-right"></i> Swipe table left/right to view player info, UTR & direct actions
+                    </div>
+
+                    <!-- New Joiny Table -->
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Reg ID</th>
+                                    <th>Category</th>
+                                    <th>Player Info (Age & DOB)</th>
+                                    <th>Father's Name</th>
+                                    <th>Contact & City</th>
+                                    <th>Playing Role & Style</th>
+                                    <th>Fee & UTR Payment</th>
+                                    <th>Status</th>
+                                    <th>Direct Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="newJoinyTableBody">
+                                <!-- Populated dynamically by admin.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================================================================= -->
+            <!-- VIEW 1B: Tournament & Cup Registrations Manager (New Dedicated)   -->
+            <!-- ================================================================= -->
+            <section class="admin-view-panel" id="tournamentRegsView">
                 <div class="table-card">
                     <div class="table-controls">
-                        <!-- Search Box -->
-                        <input type="text" id="bookingSearchInput" class="search-box" placeholder="Search by name, phone, ID, city..." oninput="handleBookingSearch()">
+                        <!-- Search Box with Anti-Autofill & Clear Button -->
+                        <div style="position: relative; flex: 1; max-width: 380px;">
+                            <input type="search" id="tournamentSearchInput" class="search-box" style="width: 100%; padding-right: 32px;" placeholder="Search player/team, phone, cup, UTR..." autocomplete="chrome-off" autocorrect="off" autocapitalize="off" spellcheck="false" name="rca_search_tournaments" readonly onfocus="this.removeAttribute('readonly')" oninput="handleTournamentSearch()">
+                            <button type="button" onclick="clearSearchInput('tournamentSearchInput', 'tournament')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--admin-text-dim); cursor: pointer; font-size: 14px;" title="Clear Search">✕</button>
+                        </div>
+
+                        <!-- Filter Status Tabs -->
+                        <div class="filter-group">
+                            <button class="filter-btn active" onclick="filterTournamentsTable('All', this)">All</button>
+                            <button class="filter-btn" onclick="filterTournamentsTable('RRPL', this)">RRPL 2026</button>
+                            <button class="filter-btn" onclick="filterTournamentsTable('RAM SPORTS', this)">RAM Sports Cup</button>
+                            <button class="filter-btn" onclick="filterTournamentsTable('Pending UTR', this)">Pending UTR</button>
+                            <button class="filter-btn" onclick="filterTournamentsTable('Confirmed', this)">Confirmed</button>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="table-controls-actions">
+                            <button class="btn btn-outline btn-sm" onclick="exportTournamentRegistrationsCSV()">
+                                <i class="fa-solid fa-file-excel"></i> Export CSV
+                            </button>
+                            <button class="btn btn-purple btn-sm" onclick="triggerManualSheetSync()">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Sync to Google Sheet
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Table Scroll Hint for Mobile Screens -->
+                    <div class="table-scroll-hint">
+                        <i class="fa-solid fa-arrows-left-right"></i> Swipe table left/right to view details, UTR & actions
+                    </div>
+
+                    <!-- Tournament Registrations Table -->
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Reg ID</th>
+                                    <th>Player / Team Info</th>
+                                    <th>Tournament / Cup</th>
+                                    <th>Contact Details</th>
+                                    <th>Role / Specialty</th>
+                                    <th>Fee & Payment (UTR)</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Direct Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tournamentRegsTableBody">
+                                <!-- Populated dynamically by admin.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================================================================= -->
+            <!-- VIEW 1C: Slot & Ground Bookings Manager                           -->
+            <!-- ================================================================= -->
+            <section class="admin-view-panel" id="bookingsView">
+                <div class="table-card">
+                    <div class="table-controls">
+                        <!-- Search Box with Anti-Autofill & Clear Button -->
+                        <div style="position: relative; flex: 1; max-width: 380px;">
+                            <input type="search" id="bookingSearchInput" class="search-box" style="width: 100%; padding-right: 32px;" placeholder="Search slot by name, phone, ID, city..." autocomplete="chrome-off" autocorrect="off" autocapitalize="off" spellcheck="false" name="rca_search_slots" readonly onfocus="this.removeAttribute('readonly')" oninput="handleBookingSearch()">
+                            <button type="button" onclick="clearSearchInput('bookingSearchInput', 'slot')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--admin-text-dim); cursor: pointer; font-size: 14px;" title="Clear Search">✕</button>
+                        </div>
 
                         <!-- Filter Status Tabs -->
                         <div class="filter-group">
@@ -226,9 +408,9 @@
                                 <tr>
                                     <th>Booking ID</th>
                                     <th>Player Info</th>
-                                    <th>Total Persons</th>
+                                    <th>Category / Group</th>
                                     <th>Contact Details</th>
-                                    <th>Program / Type</th>
+                                    <th>Program / Payment (UTR)</th>
                                     <th>Date & Time</th>
                                     <th>Status</th>
                                     <th>Direct Actions</th>
@@ -348,6 +530,63 @@
             <!-- VIEW 3: Slots & Sold Out Availability Manager (User Requested)    -->
             <!-- ================================================================= -->
             <section class="admin-view-panel" id="slotsView">
+                <!-- Slot Booking UTR Policy Settings Card (User Requested) -->
+                <div class="admin-card-form" style="border: 1.5px solid var(--admin-gold); margin-bottom: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                        <div>
+                            <span class="status-pill status-Confirmed" style="margin-bottom: 6px; display: inline-flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-receipt"></i> Slot Booking Policy
+                            </span>
+                            <h3 class="brand-font" style="color: var(--admin-gold-light); margin: 0; font-size: 1.25rem;">
+                                Slot Booking Payment UTR Policy
+                            </h3>
+                            <p style="color: var(--admin-text-dim); font-size: 0.88rem; margin-top: 4px;">
+                                Set whether customers booking turf/practice slots MUST enter a UPI UTR number or if it is Optional. (Admissions ₹1,499 always require UTR).
+                            </p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 16px; background: rgba(0,0,0,0.6); padding: 10px 18px; border-radius: 10px; border: 1px solid rgba(212, 175, 55, 0.4);">
+                            <label style="color: #fff; font-size: 0.9rem; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="adminSlotUtrMode" value="optional" id="slotUtrOptionalRadio" onchange="handleSlotUtrPolicyChange(false)" checked>
+                                <span>Optional UTR</span>
+                            </label>
+                            <label style="color: #fff; font-size: 0.9rem; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="adminSlotUtrMode" value="mandatory" id="slotUtrMandatoryRadio" onchange="handleSlotUtrPolicyChange(true)">
+                                <span style="color: #facc15;"><i class="fa-solid fa-asterisk" style="font-size: 0.75rem;"></i> Mandatory UTR</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Persons / Group Sizes Options Manager (User Requested) -->
+                <div class="admin-card-form" style="border: 1.5px solid var(--admin-gold); margin-bottom: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+                        <div>
+                            <span class="status-pill status-Confirmed" style="margin-bottom: 6px; display: inline-flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-users"></i> Booking Group Sizes
+                            </span>
+                            <h3 class="brand-font" style="color: var(--admin-gold-light); margin: 0; font-size: 1.25rem;">
+                                Total Persons / Group Sizes Options Manager
+                            </h3>
+                            <p style="color: var(--admin-text-dim); font-size: 0.88rem; margin-top: 4px;">
+                                Add or delete group sizes (1 Player, 2 Players, Full Team, etc.) that appear on all booking forms and ground slot pricing.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Active Person Tiers Badges List -->
+                    <div id="adminPersonTiersList" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
+                        <!-- Populated dynamically by admin.js -->
+                    </div>
+
+                    <!-- Add New Tier Form -->
+                    <form id="addPersonTierForm" onsubmit="handleAddPersonTier(event)" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px dashed rgba(212,175,55,0.3);">
+                        <input type="text" id="newPersonTierName" class="auth-input" style="flex: 1; min-width: 250px;" placeholder="e.g. 4 Players, Weekend Squad (15-20), Corporate Team" required>
+                        <button type="submit" class="btn btn-gold btn-sm">
+                            <i class="fa-solid fa-plus-circle"></i> Add Group Option
+                        </button>
+                    </form>
+                </div>
+
                 <!-- Slot Availability Overview Card -->
                 <div class="admin-card-form">
                     <h3 class="brand-font" style="color: var(--admin-gold-light); margin-bottom: 6px;">
@@ -370,7 +609,9 @@
                                     <th>Slot Name</th>
                                     <th>Time Window</th>
                                     <th>Facility</th>
-                                    <th>Rate (₹)</th>
+                                    <th>Base Rate</th>
+                                    <th>Group / Person Fees (₹)</th>
+                                    <th>Payment QR (Fixed)</th>
                                     <th>Live Availability</th>
                                     <th>1-Click Action</th>
                                     <th>Delete</th>
@@ -413,6 +654,18 @@
                             <div class="form-group" style="grid-column: 1/-1;">
                                 <label>Amenities / Highlights (comma-separated)</label>
                                 <input type="text" id="customSlotAmenities" class="auth-input" placeholder="e.g. Turf Pitch, Speed Radar, Video Analysis, Water">
+                            </div>
+
+                            <div class="form-group" style="grid-column: 1/-1;">
+                                <label>Fixed Amount Payment QR Code (Optional)</label>
+                                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                    <input type="file" id="customSlotQrFile" accept="image/*" class="auth-input" style="flex: 1; min-width: 200px;">
+                                    <span style="color: var(--admin-text-dim); font-size: 0.82rem;">OR</span>
+                                    <input type="url" id="customSlotQrUrl" class="auth-input" placeholder="Paste QR Image URL (Optional)" style="flex: 1; min-width: 200px;">
+                                </div>
+                                <small style="color: #a7f3d0; font-size: 0.78rem; display: block; margin-top: 4px;">
+                                    <i class="fa-solid fa-circle-info"></i> If left empty, system automatically generates a PhonePe UPI QR with this slot's exact rate!
+                                </small>
                             </div>
                         </div>
 
@@ -538,6 +791,144 @@
             </section>
 
             <!-- ================================================================= -->
+            <!-- VIEW: About, Committee & Sponsorship Manager                      -->
+            <!-- ================================================================= -->
+            <section class="admin-view-panel" id="aboutView">
+                <!-- Overview Header -->
+                <div class="admin-card-form" style="border: 1px solid var(--admin-gold); background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(36, 8, 60, 0.95)); margin-bottom: 24px;">
+                    <span class="status-pill status-Confirmed" style="margin-bottom: 8px;">
+                        <i class="fa-solid fa-users-gear"></i> Organization & Leadership
+                    </span>
+                    <h3 class="brand-font" style="color: var(--admin-gold-light); margin-bottom: 6px; font-size: 1.4rem;">
+                        About, Management Committee & Sponsorships
+                    </h3>
+                    <p style="color: var(--admin-text-dim); font-size: 0.92rem; max-width: 850px;">
+                        Manage the 3 sub-elements displayed in the website's About section: <strong>1. Coach R.K. Chauhan</strong> (Founder Bio, Quote & Mentorship), <strong>2. Committee Members</strong> (President, Owner, CEO, Coaches with photo, name & designation), and <strong>3. Official Sponsorships</strong> (Sponsor name, partnership title, city & details).
+                    </p>
+                </div>
+
+                <!-- SUB-ELEMENT 2: Management Committee Manager -->
+                <div class="table-card" style="margin-bottom: 28px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+                        <div>
+                            <h3 class="brand-font" style="color: var(--admin-gold-light); margin-bottom: 4px;">
+                                <i class="fa-solid fa-users-gear"></i> 2. Management Committee (President, Owner, CEO, Coaches)
+                            </h3>
+                            <p style="color: var(--admin-text-dim); font-size: 0.88rem;">
+                                Upload photos, set designations (e.g. President, Academy Owner, CEO, Head Coach), and add bios.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-gold btn-sm" onclick="openAddCommitteeMemberModal()">
+                            <i class="fa-solid fa-plus"></i> Add Committee Member
+                        </button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Photo</th>
+                                    <th>Member Name</th>
+                                    <th>Designation / Role</th>
+                                    <th>Bio / Highlights</th>
+                                    <th>Display Order</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminCommitteeTableBody">
+                                <!-- Populated dynamically by admin.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SUB-ELEMENT 3: Official Sponsorship Manager -->
+                <div class="table-card" style="margin-bottom: 28px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+                        <div>
+                            <h3 class="brand-font" style="color: var(--admin-gold-light); margin-bottom: 4px;">
+                                <i class="fa-solid fa-handshake"></i> 3. Official Sponsorship & Partners
+                            </h3>
+                            <p style="color: var(--admin-text-dim); font-size: 0.88rem;">
+                                Add sponsor name, partnership designation (e.g. Official Kit Partner, Title Sponsor), city, and short information.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-gold btn-sm" onclick="openAddSponsorModal()">
+                            <i class="fa-solid fa-plus"></i> Add Official Sponsor
+                        </button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Logo / Banner</th>
+                                    <th>Sponsor Name</th>
+                                    <th>Designation / Partnership</th>
+                                    <th>City</th>
+                                    <th>Short Information</th>
+                                    <th>Display Order</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminSponsorsTableBody">
+                                <!-- Populated dynamically by admin.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SUB-ELEMENT 1: Founder Profile Editor (Coach R.K. Chauhan) -->
+                <div class="admin-card-form">
+                    <h3 class="brand-font" style="color: var(--admin-gold-light); margin-bottom: 6px;">
+                        <i class="fa-solid fa-user-tie"></i> 1. Coach R.K. Chauhan Profile & Story
+                    </h3>
+                    <p style="color: var(--admin-text-dim); font-size: 0.88rem; margin-bottom: 18px;">
+                        Update Coach R.K. Chauhan's inspirational quote, mentorship experience years, biography, and direct social links shown on the website.
+                    </p>
+
+                    <form id="adminAboutProfileForm" onsubmit="handleAdminAboutProfileSubmit(event)">
+                        <div class="admin-form-grid">
+                            <div class="form-group">
+                                <label>Head Coach & Founder Name *</label>
+                                <input type="text" id="profHeadCoach" class="auth-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Founder Official Title *</label>
+                                <input type="text" id="profTitle" class="auth-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Years of Mentorship (Badge) *</label>
+                                <input type="text" id="profYearsExp" class="auth-input" placeholder="e.g. 8+" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Direct Contact Phone *</label>
+                                <input type="tel" id="profPhone" class="auth-input" required>
+                            </div>
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label>Official Instagram Profile Link *</label>
+                                <input type="url" id="profInstagramUrl" class="auth-input" required>
+                            </div>
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label>Inspirational Philosophy Quote *</label>
+                                <textarea id="profQuote" class="auth-input" rows="2" required></textarea>
+                            </div>
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label>Biography & Academy Vision Story *</label>
+                                <textarea id="profBio" class="auth-input" rows="4" required></textarea>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 18px; text-align: right;">
+                            <button type="submit" class="btn btn-gold btn-sm">
+                                <i class="fa-solid fa-floppy-disk"></i> Save Founder Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- ================================================================= -->
             <!-- VIEW 6: Academy Settings & Google Sheets Sync (User Requested)    -->
             <!-- ================================================================= -->
             <section class="admin-view-panel" id="settingsView">
@@ -616,45 +1007,308 @@
                     <div style="margin-top: 20px;">
                         <div class="form-group">
                             <label style="color: var(--admin-gold-light); font-weight: 600;">Google Apps Script Webhook URL</label>
-                            <div style="display: flex; gap: 10px; margin-top: 6px;">
-                                <input type="url" id="sheetWebhookUrl" class="auth-input" style="flex-grow: 1;" placeholder="https://script.google.com/macros/s/AKfycbx.../exec">
+                            <div style="display: flex; gap: 10px; margin-top: 6px; flex-wrap: wrap;">
+                                <input type="url" id="sheetWebhookUrl" class="auth-input" style="flex-grow: 1; min-width: 260px;" placeholder="https://script.google.com/macros/s/AKfycbx.../exec">
                                 <button class="btn btn-purple btn-sm" onclick="saveGoogleSheetWebhook()">
                                     <i class="fa-solid fa-floppy-disk"></i> Save Webhook
                                 </button>
+                                <button class="btn btn-gold btn-sm" onclick="testGoogleSheetWebhookEmail()">
+                                    <i class="fa-solid fa-paper-plane"></i> 🧪 Send Test Mail
+                                </button>
                             </div>
                             <span style="font-size: 0.8rem; color: #baa3d6; margin-top: 4px; display: block;">
-                                When saved, every new booking submitted on the website will instantly write to your Google Sheet!
+                                When saved, every new booking submitted on the website will instantly write to your Google Sheet and send email alert to <strong>rcaacademy9897@gmail.com</strong>!
                             </span>
                         </div>
                     </div>
 
                     <!-- 2-Minute Google Apps Script Guide -->
-                    <div style="margin-top: 20px; padding: 16px; background: rgba(12, 2, 20, 0.8); border: 1px dashed rgba(212, 175, 55, 0.4); border-radius: 10px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <strong style="color: var(--admin-gold-light); font-size: 0.88rem;">
-                                <i class="fa-solid fa-code"></i> Quick 2-Minute Setup for Google Sheets
-                            </strong>
-                            <button class="btn btn-outline btn-sm" onclick="copyAppsScriptCode()" style="padding: 4px 12px; font-size: 0.78rem;">
+                    <div style="margin-top: 20px; padding: 18px; background: rgba(12, 2, 20, 0.85); border: 1.5px dashed rgba(212, 175, 55, 0.5); border-radius: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <strong style="color: var(--admin-gold-light); font-size: 0.95rem;">
+                                    <i class="fa-solid fa-envelope-circle-check"></i> Google Sheets & Instant Email Notification Setup
+                                </strong>
+                                <span style="display: block; font-size: 0.8rem; color: #a7f3d0; margin-top: 2px;">
+                                    Dual Feature: Separate Sheet Tabs + Instant HTML Email Alert directly to rcaacademy9897@gmail.com
+                                </span>
+                            </div>
+                            <button class="btn btn-outline btn-sm" onclick="copyAppsScriptCode()" style="padding: 6px 14px; font-size: 0.82rem; border-color: var(--admin-gold); color: var(--admin-gold-light);">
                                 <i class="fa-regular fa-copy"></i> Copy Script Code
                             </button>
                         </div>
-                        <ol style="font-size: 0.82rem; color: #d5cae6; margin-left: 20px; margin-bottom: 12px; line-height: 1.6;">
-                            <li>Create a new Google Sheet at <strong>sheets.google.com</strong>.</li>
-                            <li>Click <strong>Extensions → Apps Script</strong> in the top menu.</li>
-                            <li>Paste the code snippet below and click <strong>Deploy → New deployment → Web app</strong>.</li>
-                            <li>Set <em>"Who has access"</em> to <strong>"Anyone"</strong>, deploy, and copy the Web App URL into the box above.</li>
+                        <ol style="font-size: 0.84rem; color: #e2e8f0; margin-left: 20px; margin-bottom: 14px; line-height: 1.8;">
+                            <li>Apne Google Sheet par jayein (<strong>sheets.google.com</strong>).</li>
+                            <li>Menu me <strong>Extensions → Apps Script</strong> par click karein.</li>
+                            <li>Editor ka saara purana code delete karein aur neeche diya gaya <strong>Complete Script Code paste karein</strong>, phir <strong>Save (💾)</strong> dabayein.</li>
+                            <li><strong>⚠️ MANDATORY (One-Time Email Permission):</strong> Top dropdown me <code>testEmailAlert</code> select karein aur <strong>"Run"</strong> button dabayein. Google aapse <em>"Review Permissions" → Select Account → "Advanced" → "Go to Untitled project (unsafe)" → "Allow"</em> maangega. Allow karte hi turant aapke Gmail (<strong>rcaacademy9897@gmail.com</strong>) par Test Mail aa jayega!</li>
+                            <li>Top-right me <strong>Deploy → Manage deployments</strong> par click karein, pencil (Edit) icon dabayein, <strong>Version: "New version"</strong> select karein, aur <strong>Deploy</strong> dabayein.</li>
+                            <li>Web App URL copy karke upar wale box me paste karein aur <strong>"Save Webhook"</strong> dabayein!</li>
                         </ol>
-                        <div class="code-snippet-box" id="appsScriptSnippet">function doPost(e) {
+                        <div class="code-snippet-box" id="appsScriptSnippet">// ============================================================================
+// RAM CRICKET ACADEMY (VRINDAVAN) - GOOGLE APPS SCRIPT WEBHOOK V3
+// Official Email: rcaacademy9897@gmail.com | Phone: +91 9897517704
+// Dual Feature: Instant Dual-Tab Google Sheet Sync + Instant HTML Email Alerts
+// ============================================================================
+
+var OFFICIAL_ADMIN_EMAIL = "rcaacademy9897@gmail.com";
+
+// 1. ONE-TIME AUTHORIZATION & TEST FUNCTION
+// Apps Script editor ke top dropdown me 'testEmailAlert' select karke 'Run' dabayein!
+function testEmailAlert() {
+  var subject = "🏏 [RCA Test] Ram Cricket Academy Email Notifications Active!";
+  var htmlBody = 
+    "<div style='font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; background: #0c0214; color: #ffffff; border: 2px solid #d4af37; border-radius: 12px; overflow: hidden;'>" +
+      "<div style='background: linear-gradient(135deg, #1f0833, #3b1259); padding: 20px; text-align: center; border-bottom: 2px solid #d4af37;'>" +
+        "<h2 style='color: #d4af37; margin: 0; font-size: 22px;'>RAM CRICKET ACADEMY (VRINDAVAN)</h2>" +
+        "<p style='color: #4ade80; margin: 6px 0 0; font-size: 14px; font-weight: bold;'>⚡ EMAIL SYSTEM VERIFICATION SUCCESSFUL</p>" +
+      "</div>" +
+      "<div style='padding: 24px;'>" +
+        "<p style='font-size: 15px; color: #e2e8f0; line-height: 1.6;'>Congratulations! Your Google Apps Script webhook is now fully authorized to send emails.</p>" +
+        "<div style='background: rgba(255,255,255,0.06); padding: 16px; border-radius: 8px; border-left: 4px solid #4ade80; margin: 16px 0;'>" +
+          "<p style='margin: 0; color: #ffffff;'><strong>Deliveries:</strong> All new player admissions (U-14, U-16, U-19) and turf slot bookings will be delivered instantly to <strong>" + OFFICIAL_ADMIN_EMAIL + "</strong>.</p>" +
+        "</div>" +
+        "<p style='font-size: 13px; color: #94a3b8;'>Ground: RCA Ground, Panigaon Raya Road, Vrindavan (Mathura)<br>Head Coach: Coach R.K. Chauhan (+91 9897517704)</p>" +
+      "</div>" +
+    "</div>";
+
+  var plainBody = "RAM CRICKET ACADEMY - Email System Active!\nNew admissions and slot bookings will arrive instantly at " + OFFICIAL_ADMIN_EMAIL;
+
   try {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    var data = JSON.parse(e.postData.contents);
-    if (sheet.getLastRow() === 0) {
-      sheet.appendRow(["Booking ID", "Player Name", "Total Persons", "Phone", "Booking Type", "Date", "Time", "City", "Role", "Created At"]);
+    GmailApp.sendEmail(OFFICIAL_ADMIN_EMAIL, subject, plainBody, {
+      htmlBody: htmlBody,
+      name: "RAM Cricket Academy Alerts"
+    });
+    Logger.log("✅ Success: Email sent via GmailApp to " + OFFICIAL_ADMIN_EMAIL);
+  } catch (err1) {
+    MailApp.sendEmail({
+      to: OFFICIAL_ADMIN_EMAIL,
+      subject: subject,
+      body: plainBody,
+      htmlBody: htmlBody,
+      name: "RAM Cricket Academy Alerts"
+    });
+    Logger.log("✅ Success: Email sent via MailApp to " + OFFICIAL_ADMIN_EMAIL);
+  }
+}
+
+// 2. MAIN WEBHOOK LISTENER (Handles incoming submissions from website)
+function doPost(e) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var data = {};
+    if (e && e.postData && e.postData.contents) {
+      data = JSON.parse(e.postData.contents);
+    } else if (e && e.parameter) {
+      data = e.parameter;
     }
-    sheet.appendRow([data.id, data.name, data.totalPersons || "1", data.phone, data.bookingType, data.slotDate, data.timeSlot, data.city, data.role, data.createdAt]);
-    return ContentService.createTextOutput(JSON.stringify({result: "success"})).setMimeType(ContentService.MimeType.JSON);
+
+    // Direct test ping from admin panel
+    if (data.isTest) {
+      testEmailAlert();
+      return ContentService.createTextOutput(JSON.stringify({ result: "success", mode: "test_email_sent" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    var ft = String(data.formType || '').toLowerCase();
+    var bt = String(data.bookingType || '').toLowerCase();
+    var cat = String(data.category || '').toLowerCase();
+
+    var isExplicitSlot = (
+      data.sheetTab === 'Slot Bookings' ||
+      ft.indexOf('slot') > -1 ||
+      ft.indexOf('ground') > -1 ||
+      bt.indexOf('slot') > -1 ||
+      bt.indexOf('net practice') > -1 ||
+      bt.indexOf('match slot') > -1 ||
+      bt.indexOf('turf slot') > -1 ||
+      bt.indexOf('bowling machine') > -1 ||
+      bt.indexOf('floodlight') > -1
+    );
+
+    var isNewJoiny = !isExplicitSlot && (
+      data.sheetTab === 'New Joiny Admissions' ||
+      ft === 'academy_admission' ||
+      ft === 'rrpl_trials' ||
+      bt.indexOf('rrpl') > -1 ||
+      bt.indexOf('admission') > -1 ||
+      bt.indexOf('trial') > -1 ||
+      cat.indexOf('under-14') > -1 ||
+      cat.indexOf('under-16') > -1 ||
+      cat.indexOf('under-19') > -1 ||
+      cat.indexOf('u-14') > -1 ||
+      cat.indexOf('u-16') > -1 ||
+      cat.indexOf('u-19') > -1
+    );
+
+    var adminEmail = OFFICIAL_ADMIN_EMAIL;
+    var cleanPhone = String(data.phone || '').replace(/[^0-9]/g, '');
+    var waLink = cleanPhone ? "https://wa.me/91" + (cleanPhone.length > 10 ? cleanPhone.slice(-10) : cleanPhone) : "";
+
+    if (isNewJoiny) {
+      // 1. DEDICATED TAB: "New Joiny Admissions"
+      var tabName = "New Joiny Admissions";
+      var sheet = ss.getSheetByName(tabName);
+      if (!sheet) {
+        sheet = ss.insertSheet(tabName);
+        sheet.appendRow([
+          "Submission Time", "Reg ID", "Category", "Player Name", "DOB", "Age",
+          "Father Name", "Phone / WhatsApp", "City", "Playing Role", "Batting Style",
+          "Bowling Style", "Fee (₹)", "Payment UTR / Ref", "Status", "Remarks"
+        ]);
+        var header = sheet.getRange(1, 1, 1, 16);
+        header.setBackground("#15803d").setFontColor("#ffffff").setFontWeight("bold");
+        sheet.setFrozenRows(1);
+      }
+
+      sheet.appendRow([
+        data.timestamp || new Date().toLocaleString("en-IN"),
+        data.bookingId || data.id || ("RCA-ADM-" + Date.now()),
+        data.category || "Under-16",
+        data.name || "Anonymous Player",
+        data.dob || "-",
+        data.age || "-",
+        data.fatherName || "-",
+        "'" + (data.phone || ""),
+        data.city || "Vrindavan",
+        data.role || "All-Rounder",
+        data.battingStyle || "-",
+        data.bowlingStyle || "-",
+        data.feeAmount || 1499,
+        "'" + (data.utrNumber || "-"),
+        data.status || "Pending Verification",
+        data.remarks || ""
+      ]);
+
+      // Direct Rich HTML Email to Coach Chauhan & RCA Admin
+      try {
+        var subject = "🏏 [New RCA Admission] " + (data.category || "Admission") + " - " + (data.name || "Player") + " (UTR: " + (data.utrNumber || "Pending") + ")";
+        var htmlContent = 
+          "<div style='font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; background: #0c0214; color: #ffffff; border: 2px solid #d4af37; border-radius: 12px; overflow: hidden;'>" +
+            "<div style='background: linear-gradient(135deg, #1f0833, #3b1259); padding: 20px; text-align: center; border-bottom: 2px solid #d4af37;'>" +
+              "<h2 style='color: #d4af37; margin: 0; font-size: 22px;'>RAM CRICKET ACADEMY (VRINDAVAN)</h2>" +
+              "<p style='color: #4ade80; margin: 6px 0 0; font-size: 14px; font-weight: bold;'>🏏 NEW PLAYER ADMISSION / TRIAL RECEIVED</p>" +
+            "</div>" +
+            "<div style='padding: 24px;'>" +
+              "<table style='width: 100%; border-collapse: collapse; font-size: 14px; color: #ffffff;'>" +
+                "<tr style='border-bottom: 1px solid rgba(255,255,255,0.1);'><td style='padding: 8px 0; color: #d4af37; font-weight: bold; width: 40%;'>Registration ID</td><td style='padding: 8px 0; font-weight: bold; color: #4ade80;'>" + (data.bookingId || data.id || "-") + "</td></tr>" +
+                "<tr style='border-bottom: 1px solid rgba(255,255,255,0.1);'><td style='padding: 8px 0; color: #d4af37; font-weight: bold;'>Category</td><td style='padding: 8px 0; font-weight: bold;'>" + (data.category || "Under-16") + "</td></tr>" +
+                "<tr style='border-bottom: 1px solid rgba(255,255,255,0.1);'><td style='padding: 8px 0; color: #d4af37; font-weight: bold;'>Player Name</td><td style='padding: 8px 0; font-size: 16px; font-weight: bold;'>" + (data.name || "-") + "</td></tr>" +
+                "<tr style='border-bottom: 1px solid rgba(255,255,255,0.1);'><td style='padding: 8px 0; color: #d4af37; font-weight: bold;'>DOB & Age</td><td style='padding: 8px 0;'>" + (data.dob || "-") + " (" + (data.age || "-") + ")</td></tr>" +
+                "<tr style='border-bottom: 1px solid rgba(255,255,255,0.1);'><td style='padding: 8px 0; color: #d4af37; font-weight: bold;'>Father's Name</td><td style='padding: 8px 0;'>" + (data.fatherName || "-") + "</td></tr>" +
+                "<tr style='border-bottom: 1px solid rgba(255,255,255,0.1);'><td style='padding: 8px 0; color: #d4af37; font-weight: bold;'>Mobile / WhatsApp</td><td style='padding: 8px 0;'>" + (data.phone || "-") + "</td></tr>" +
+                "<tr style='border-bottom: 1px solid rgba(255,255,255,0.1);'><td style='padding: 8px 0; color: #d4af37; font-weight: bold;'>City / Hometown</td><td style='padding: 8px 0;'>" + (data.city || "Vrindavan") + "</td></tr>" +
+                "<tr style='border-bottom: 1px solid rgba(255,255,255,0.1);'><td style='padding: 8px 0; color: #d4af37; font-weight: bold;'>Playing Role</td><td style='padding: 8px 0;'>" + (data.role || "All-Rounder") + " (" + (data.battingStyle || "-") + " / " + (data.bowlingStyle || "-") + ")</td></tr>" +
+                "<tr style='border-bottom: 1px solid rgba(255,255,255,0.1);'><td style='padding: 8px 0; color: #d4af37; font-weight: bold;'>Registration Fee</td><td style='padding: 8px 0; font-size: 16px; font-weight: bold; color: #4ade80;'>₹" + (data.feeAmount || "1,499") + "</td></tr>" +
+                "<tr><td style='padding: 8px 0; color: #d4af37; font-weight: bold;'>UPI UTR Number</td><td style='padding: 8px 0; font-weight: bold; color: #fbbf24; font-family: monospace; font-size: 15px;'>" + (data.utrNumber || "Not Provided") + "</td></tr>" +
+              "</table>" +
+              (waLink ? "<div style='text-align: center; margin: 24px 0 10px;'><a href='" + waLink + "' style='background: #25D366; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; display: inline-block; font-size: 14px;'>💬 Chat with Player on WhatsApp</a></div>" : "") +
+              "<div style='text-align: center; margin-bottom: 15px;'><a href='https://ramcricketacademy.com/admin.html' style='color: #d4af37; text-decoration: underline; font-size: 13px;'>🌐 Open Admin Console</a></div>" +
+              "<hr style='border: 0; border-top: 1px solid rgba(212,175,55,0.3); margin: 20px 0;'>" +
+              "<p style='font-size: 12px; color: #94a3b8; margin: 0;'>Ground: RCA Ground, Panigaon Raya Road, Vrindavan (Mathura)<br>Head Coach: Coach R.K. Chauhan (+91 9897517704)</p>" +
+            "</div>" +
+          "</div>";
+
+        var plainText = "NEW RCA ADMISSION:\n" +
+          "ID: " + (data.bookingId || data.id) + "\n" +
+          "Category: " + (data.category || "Under-16") + "\n" +
+          "Player: " + (data.name || "-") + "\n" +
+          "Phone: " + (data.phone || "-") + "\n" +
+          "City: " + (data.city || "-") + "\n" +
+          "Fee: Rs. " + (data.feeAmount || "1499") + "\n" +
+          "UTR: " + (data.utrNumber || "-");
+
+        try {
+          GmailApp.sendEmail(adminEmail, subject, plainText, { htmlBody: htmlContent, name: "RAM Cricket Academy Alerts" });
+        } catch (gErr) {
+          MailApp.sendEmail({ to: adminEmail, subject: subject, body: plainText, htmlBody: htmlContent, name: "RAM Cricket Academy Alerts" });
+        }
+      } catch (mailErr) {
+        Logger.log("Admission email failed: " + mailErr.toString());
+      }
+
+    } else {
+      // 2. DEDICATED TAB: "Slot Bookings"
+      var slotTabName = "Slot Bookings";
+      var slotSheet = ss.getSheetByName(slotTabName);
+      if (!slotSheet) {
+        slotSheet = ss.insertSheet(slotTabName);
+        slotSheet.appendRow([
+          "Submission Time", "Booking ID", "Customer Name", "Phone", "Email",
+          "Slot Date", "Time Slot", "Facility / Turf", "Booking Type", "Total Persons",
+          "Fee (₹)", "Payment UTR", "Status", "Remarks"
+        ]);
+        var slotHeader = slotSheet.getRange(1, 1, 1, 14);
+        slotHeader.setBackground("#1e293b").setFontColor("#ffffff").setFontWeight("bold");
+        slotSheet.setFrozenRows(1);
+      }
+
+      slotSheet.appendRow([
+        data.timestamp || new Date().toLocaleString("en-IN"),
+        data.bookingId || data.id || ("RCA-SLOT-" + Date.now()),
+        data.name || "Customer",
+        "'" + (data.phone || ""),
+        data.email || "-",
+        data.slotDate || "-",
+        data.timeSlot || "-",
+        data.facilityType || "Turf Pitch",
+        data.bookingType || "Slot Booking",
+        data.totalPersons || "1 Player",
+        data.feeAmount || "-",
+        "'" + (data.utrNumber || "-"),
+        data.status || "New",
+        data.remarks || ""
+      ]);
+
+      // Direct Rich HTML Email for Slot Booking
+      try {
+        var slotSubject = "📅 [New RCA Slot Booking] " + (data.name || "Customer") + " - " + (data.slotDate || "Date") + " (" + (data.timeSlot || "Slot") + ")";
+        var slotHtml = 
+          "<div style='font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; background: #0c0214; color: #ffffff; border: 2px solid #d4af37; border-radius: 12px; overflow: hidden;'>" +
+            "<div style='background: linear-gradient(135deg, #1f0833, #3b1259); padding: 20px; text-align: center; border-bottom: 2px solid #d4af37;'>" +
+              "<h2 style='color: #d4af37; margin: 0; font-size: 22px;'>RAM CRICKET ACADEMY (VRINDAVAN)</h2>" +
+              "<p style='color: #60a5fa; margin: 6px 0 0; font-size: 14px; font-weight: bold;'>📅 NEW TURF / GROUND SLOT BOOKING</p>" +
+            "</div>" +
+            "<div style='padding: 24px;'>" +
+              "<table style='width: 100%; border-collapse: collapse; font-size: 14px; color: #ffffff;'>" +
+                "<tr style='border-bottom: 1px solid rgba(255,255,255,0.1);'><td style='padding: 8px 0; color: #d4af37; font-weight: bold; width: 40%;'>Booking ID</td><td style='padding: 8px 0; font-weight: bold; color: #60a5fa;'>" + (data.bookingId || data.id || "-") + "</td></tr>" +
+                "<tr style='border-bottom: 1px solid rgba(255,255,255,0.1);'><td style='padding: 8px 0; color: #d4af37; font-weight: bold;'>Customer Name</td><td style='padding: 8px 0; font-size: 16px; font-weight: bold;'>" + (data.name || "-") + "</td></tr>" +
+                "<tr style='border-bottom: 1px solid rgba(255,255,255,0.1);'><td style='padding: 8px 0; color: #d4af37; font-weight: bold;'>Mobile Number</td><td style='padding: 8px 0;'>" + (data.phone || "-") + "</td></tr>" +
+                "<tr style='border-bottom: 1px solid rgba(255,255,255,0.1);'><td style='padding: 8px 0; color: #d4af37; font-weight: bold;'>Slot Date & Time</td><td style='padding: 8px 0; font-weight: bold; color: #4ade80;'>" + (data.slotDate || "-") + " (" + (data.timeSlot || "-") + ")</td></tr>" +
+                "<tr style='border-bottom: 1px solid rgba(255,255,255,0.1);'><td style='padding: 8px 0; color: #d4af37; font-weight: bold;'>Facility</td><td style='padding: 8px 0;'>" + (data.facilityType || "Turf Pitch") + "</td></tr>" +
+                "<tr style='border-bottom: 1px solid rgba(255,255,255,0.1);'><td style='padding: 8px 0; color: #d4af37; font-weight: bold;'>Booking Type</td><td style='padding: 8px 0;'>" + (data.bookingType || "Slot") + "</td></tr>" +
+                "<tr style='border-bottom: 1px solid rgba(255,255,255,0.1);'><td style='padding: 8px 0; color: #d4af37; font-weight: bold;'>Slot Rate</td><td style='padding: 8px 0; font-size: 15px; font-weight: bold; color: #4ade80;'>" + (data.feeAmount ? ("₹" + data.feeAmount) : "-") + "</td></tr>" +
+                "<tr><td style='padding: 8px 0; color: #d4af37; font-weight: bold;'>Payment UTR</td><td style='padding: 8px 0; font-family: monospace; color: #fbbf24;'>" + (data.utrNumber || "Not Provided") + "</td></tr>" +
+              "</table>" +
+              (waLink ? "<div style='text-align: center; margin: 24px 0 10px;'><a href='" + waLink + "' style='background: #25D366; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; display: inline-block; font-size: 14px;'>💬 Chat with Customer on WhatsApp</a></div>" : "") +
+              "<div style='text-align: center; margin-bottom: 15px;'><a href='https://ramcricketacademy.com/admin.html' style='color: #d4af37; text-decoration: underline; font-size: 13px;'>🌐 Open Admin Console</a></div>" +
+              "<hr style='border: 0; border-top: 1px solid rgba(212,175,55,0.3); margin: 20px 0;'>" +
+              "<p style='font-size: 12px; color: #94a3b8; margin: 0;'>Ground: RCA Ground, Panigaon Raya Road, Vrindavan (Mathura)<br>Head Coach: Coach R.K. Chauhan (+91 9897517704)</p>" +
+            "</div>" +
+          "</div>";
+
+        var plainSlot = "NEW RCA SLOT BOOKING:\n" +
+          "Customer: " + (data.name || "-") + "\n" +
+          "Phone: " + (data.phone || "-") + "\n" +
+          "Date: " + (data.slotDate || "-") + "\n" +
+          "Time: " + (data.timeSlot || "-") + "\n" +
+          "Facility: " + (data.facilityType || "-") + "\n" +
+          "UTR: " + (data.utrNumber || "-");
+
+        try {
+          GmailApp.sendEmail(adminEmail, slotSubject, plainSlot, { htmlBody: slotHtml, name: "RAM Cricket Academy Alerts" });
+        } catch (gErr2) {
+          MailApp.sendEmail({ to: adminEmail, subject: slotSubject, body: plainSlot, htmlBody: slotHtml, name: "RAM Cricket Academy Alerts" });
+        }
+      } catch (mailErr2) {
+        Logger.log("Slot email failed: " + mailErr2.toString());
+      }
+    }
+
+    return ContentService.createTextOutput(JSON.stringify({ result: "success" })).setMimeType(ContentService.MimeType.JSON);
   } catch(err) {
-    return ContentService.createTextOutput(JSON.stringify({result: "error", message: err.toString()})).setMimeType(ContentService.MimeType.JSON);
+    Logger.log("Fatal doPost error: " + err.toString());
+    return ContentService.createTextOutput(JSON.stringify({ result: "error", message: err.toString() })).setMimeType(ContentService.MimeType.JSON);
   }
 }</div>
                     </div>
@@ -676,9 +1330,14 @@
                         </div>
                     </div>
 
-                    <!-- Add Booking Category Form -->
-                    <form id="addBookingTypeForm" onsubmit="handleAddBookingType(event)" style="margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap;">
-                        <input type="text" id="newBookingTypeName" class="auth-input" style="flex: 1 1 200px; min-width: 0;" placeholder="e.g. Summer Coaching Camp 2026 or Corporate Weekend Match" required>
+                    <!-- Add Booking Category Form with Dynamic Price -->
+                    <form id="addBookingTypeForm" onsubmit="handleAddBookingType(event)" style="margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                        <input type="text" id="newBookingTypeName" class="auth-input" style="flex: 2 1 200px; min-width: 0;" placeholder="Category Name (e.g. Weekend Net Session, Corporate Cup)" required>
+                        <div style="position: relative; flex: 1 1 120px;">
+                            <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--admin-gold); font-weight: bold;">₹</span>
+                            <input type="number" id="newBookingTypePrice" class="auth-input" style="padding-left: 26px;" placeholder="Fee (₹)" min="0" step="50" required>
+                        </div>
+                        <input type="text" id="newBookingTypeLabel" class="auth-input" style="flex: 1 1 120px;" placeholder="Label (e.g. 2-Hour Slot)">
                         <button type="submit" class="btn btn-gold btn-sm">
                             <i class="fa-solid fa-plus"></i> Add Category
                         </button>
@@ -689,9 +1348,10 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Category / Booking Type Name</th>
-                                    <th>Live On Website</th>
-                                    <th>Action</th>
+                                    <th>Category / Inquiry Type</th>
+                                    <th>Configured Fee / Rate</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="adminBookingTypesTableBody">
@@ -733,6 +1393,11 @@
                                 <input type="email" id="setAdminEmail" class="auth-input" required>
                             </div>
 
+                            <div class="form-group">
+                                <label><i class="fa-solid fa-indian-rupee-sign"></i> New Joiny Admission Fee (₹) [U-14, U-16, U-19]</label>
+                                <input type="number" id="setAdmissionFee" class="auth-input" min="0" step="50" placeholder="1499" required>
+                            </div>
+
                             <div class="form-group" style="grid-column: 1/-1;">
                                 <label>Official Instagram Profile URL</label>
                                 <input type="url" id="setInstagram" class="auth-input" required>
@@ -753,15 +1418,15 @@
 
             <!-- Mobile Bottom App Navigation Bar (Shown on Mobile) -->
             <nav class="admin-bottom-nav">
-                <button type="button" class="bnav-item active" data-view="bookingsView" onclick="switchView('bookingsView', this)">
-                    <i class="fa-solid fa-users"></i>
-                    <span>Bookings</span>
+                <button type="button" class="bnav-item active" data-view="newJoinyView" onclick="switchView('newJoinyView', this)">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>Admissions</span>
                 </button>
-                <button type="button" class="bnav-item" data-view="tournamentsView" onclick="switchView('tournamentsView', this)">
-                    <i class="fa-solid fa-trophy"></i>
-                    <span>Tourneys</span>
+                <button type="button" class="bnav-item" data-view="tournamentRegsView" onclick="switchView('tournamentRegsView', this)">
+                    <i class="fa-solid fa-medal"></i>
+                    <span>Tournaments</span>
                 </button>
-                <button type="button" class="bnav-item" data-view="slotsView" onclick="switchView('slotsView', this)">
+                <button type="button" class="bnav-item" data-view="bookingsView" onclick="switchView('bookingsView', this)">
                     <i class="fa-solid fa-calendar-check"></i>
                     <span>Slots</span>
                 </button>
@@ -863,5 +1528,236 @@
     <script src="js/supabase-config.js"></script>
     <script src="js/data.js"></script>
     <script src="js/admin.js"></script>
+
+    <!-- Update Slot QR Modal (User Requested) -->
+    <div class="modal-backdrop" id="updateSlotQrModal">
+        <div class="modal-box" style="max-width: 480px; padding: 28px;">
+            <button class="modal-close" onclick="closeModal('updateSlotQrModal')">&times;</button>
+            <h3 class="brand-font" style="color: var(--admin-gold-light); margin-bottom: 6px;">
+                <i class="fa-solid fa-qrcode"></i> Update Slot Payment QR Code
+            </h3>
+            <p style="color: var(--admin-text-dim); font-size: 0.88rem; margin-bottom: 14px;">
+                Custom QR for <strong id="modalSlotTitle" style="color: #fff;"></strong> (<span id="modalSlotPrice" style="color: #4ade80; font-weight: 700;"></span>)
+            </p>
+
+            <input type="hidden" id="modalSlotId">
+
+            <div style="text-align: center; margin: 16px 0;">
+                <div style="width: 140px; height: 140px; margin: 0 auto; background: #fff; padding: 6px; border-radius: 8px; border: 2px solid var(--admin-gold);">
+                    <img id="modalSlotQrPreview" src="assets/images/rca_open_qr.png" alt="Slot QR" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 14px;">
+                <label>Upload New QR Image</label>
+                <input type="file" id="modalSlotQrFileInput" accept="image/*" class="auth-input" onchange="previewModalSlotQrFile(event)">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 18px;">
+                <label>Or Paste QR Image URL</label>
+                <input type="url" id="modalSlotQrUrlInput" class="auth-input" placeholder="https://..." oninput="previewModalSlotQrUrl(this.value)">
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button type="button" class="btn btn-gold" style="flex: 1;" onclick="saveModalSlotQr()">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Slot QR
+                </button>
+                <button type="button" class="btn btn-outline" onclick="resetModalSlotQrToAuto()">
+                    <i class="fa-solid fa-rotate-left"></i> Reset to Auto QR
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Universal Price & Fee Editor Modal -->
+    <div class="modal-backdrop" id="universalPriceModal">
+        <div class="modal-box" style="max-width: 460px; padding: 26px;">
+            <button class="modal-close" onclick="closeModal('universalPriceModal')">&times;</button>
+            <h3 class="brand-font" style="color: var(--admin-gold-light); margin-bottom: 6px;">
+                <i class="fa-solid fa-pen-to-square"></i> Edit Pricing & Official Fee
+            </h3>
+            <p id="universalPriceSubtitle" style="color: var(--admin-text-dim); font-size: 0.88rem; margin-bottom: 16px;">
+                Update the rate shown on the live website and UPI payment QR.
+            </p>
+
+            <form id="universalPriceForm" onsubmit="handleUniversalPriceSubmit(event)">
+                <input type="hidden" id="editPriceTargetType">
+                <input type="hidden" id="editPriceTargetId">
+
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label id="universalPriceItemNameLabel">Item / Category / Slot Name</label>
+                    <input type="text" id="universalPriceItemName" class="auth-input" readonly style="opacity: 0.85;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label>Official Fee / Rate (₹) *</label>
+                    <div style="position: relative;">
+                        <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--admin-gold); font-weight: bold; font-size: 1.1rem;">₹</span>
+                        <input type="number" id="universalPriceValue" class="auth-input" style="padding-left: 28px; font-size: 1.1rem; font-weight: 700; color: #4ade80;" required min="0" step="50">
+                    </div>
+                </div>
+
+                <div class="form-group" id="universalPriceExtraGroup" style="margin-bottom: 18px;">
+                    <label id="universalPriceExtraLabel">Fee Label / Notes (Optional)</label>
+                    <input type="text" id="universalPriceExtra" class="auth-input" placeholder="e.g. 2-Hour Slot, Per Match, Team Entry">
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-purple btn-sm" onclick="closeModal('universalPriceModal')">Cancel</button>
+                    <button type="submit" class="btn btn-gold btn-sm"><i class="fa-solid fa-floppy-disk"></i> Save & Update Live</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Slot Person / Group Tier Pricing Modal (User Requested) -->
+    <div class="modal-backdrop" id="slotPersonPricingModal">
+        <div class="modal-box" style="max-width: 580px; padding: 28px;">
+            <button class="modal-close" onclick="closeModal('slotPersonPricingModal')">&times;</button>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                <span class="status-pill status-Confirmed"><i class="fa-solid fa-users"></i> Tier Rates</span>
+                <span id="slotPersonModalTimeBadge" style="font-size: 0.8rem; color: var(--admin-gold-light); font-weight: 600;"></span>
+            </div>
+            <h3 class="brand-font" style="color: var(--admin-gold-light); margin-bottom: 4px; font-size: 1.3rem;">
+                Configure Group / Player Fees
+            </h3>
+            <div id="slotPersonModalTitle" style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 12px;">
+                <!-- Slot title -->
+            </div>
+            <p style="color: var(--admin-text-dim); font-size: 0.85rem; margin-bottom: 18px;">
+                Set different rates for each group size (e.g. 1 Player, 2 Players, Full Team). When a customer selects that option on the website, this fee will be applied automatically!
+            </p>
+
+            <form id="slotPersonPricingForm" onsubmit="handleSaveSlotPersonPrices(event)">
+                <input type="hidden" id="slotPersonPricingSlotId">
+                <div id="slotPersonPricingInputsContainer" style="display: flex; flex-direction: column; gap: 12px; max-height: 380px; overflow-y: auto; padding-right: 6px;">
+                    <!-- Dynamically generated rows for each active person tier -->
+                </div>
+
+                <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="closeModal('slotPersonPricingModal')">Cancel</button>
+                    <button type="submit" class="btn btn-gold btn-sm">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Group Fees
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Add / Edit Committee Member (President, Owner, CEO, Coaches) -->
+    <div class="modal-backdrop" id="committeeMemberModal">
+        <div class="modal-box" style="max-width: 540px; padding: 26px;">
+            <button class="modal-close" onclick="closeModal('committeeMemberModal')">&times;</button>
+            <h3 class="brand-font" style="color: var(--admin-gold-light); margin-bottom: 6px;">
+                <i class="fa-solid fa-users-gear"></i> <span id="commModalTitle">Add Committee Member</span>
+            </h3>
+            <p style="color: var(--admin-text-dim); font-size: 0.88rem; margin-bottom: 16px;">
+                Add president, owner, CEO, coaches, or advisory board members with photo and role.
+            </p>
+
+            <form id="committeeMemberForm" onsubmit="handleCommitteeMemberSubmit(event)">
+                <input type="hidden" id="commMemberId">
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Full Name *</label>
+                    <input type="text" id="commMemberName" class="auth-input" placeholder="e.g. Shri Ramveer Singh Chauhan" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Designation / Role *</label>
+                    <input type="text" id="commMemberRole" class="auth-input" placeholder="e.g. President - RCA Board / Academy Owner / CEO / Senior Coach" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Upload Member Photo File</label>
+                    <input type="file" id="commMemberPhotoFile" class="auth-input" accept="image/*">
+                    <small style="color: var(--admin-text-dim); font-size: 0.78rem;">Upload photo file (auto-uploaded to cloud or base64)</small>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Or Photo URL</label>
+                    <input type="text" id="commMemberPhotoUrl" class="auth-input" placeholder="assets/images/logo.png or https://...">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Bio / Short Highlights</label>
+                    <textarea id="commMemberBio" class="auth-input" rows="2" placeholder="e.g. Guiding academy strategic governance and player welfare."></textarea>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 18px;">
+                    <label>Display Order (Priority)</label>
+                    <input type="number" id="commMemberOrder" class="auth-input" value="1" min="1" max="99">
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="closeModal('committeeMemberModal')">Cancel</button>
+                    <button type="submit" class="btn btn-gold btn-sm">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Member
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Add / Edit Official Sponsor -->
+    <div class="modal-backdrop" id="sponsorModal">
+        <div class="modal-box" style="max-width: 540px; padding: 26px;">
+            <button class="modal-close" onclick="closeModal('sponsorModal')">&times;</button>
+            <h3 class="brand-font" style="color: var(--admin-gold-light); margin-bottom: 6px;">
+                <i class="fa-solid fa-handshake"></i> <span id="sponModalTitle">Add Official Sponsor</span>
+            </h3>
+            <p style="color: var(--admin-text-dim); font-size: 0.88rem; margin-bottom: 16px;">
+                Add sponsor details: name, designation, city, short information, and logo.
+            </p>
+
+            <form id="sponsorForm" onsubmit="handleSponsorSubmit(event)">
+                <input type="hidden" id="sponId">
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Sponsor / Brand Name *</label>
+                    <input type="text" id="sponName" class="auth-input" placeholder="e.g. Ram Sports & Cricket Gear" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Designation / Partnership Title *</label>
+                    <input type="text" id="sponRole" class="auth-input" placeholder="e.g. Official Kit & Equipment Partner / Title Sponsor" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>City / Location *</label>
+                    <input type="text" id="sponCity" class="auth-input" placeholder="e.g. Mathura / Vrindavan" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Short Information / Details *</label>
+                    <textarea id="sponInfo" class="auth-input" rows="3" placeholder="e.g. Providing international-standard English willow bats and protective gear for all RCA tournaments." required></textarea>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Upload Sponsor Logo File</label>
+                    <input type="file" id="sponLogoFile" class="auth-input" accept="image/*">
+                    <small style="color: var(--admin-text-dim); font-size: 0.78rem;">Upload logo file (auto-uploaded to cloud or base64)</small>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Or Logo URL</label>
+                    <input type="text" id="sponLogoUrl" class="auth-input" placeholder="assets/images/logo.png or https://...">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 18px;">
+                    <label>Display Order (Priority)</label>
+                    <input type="number" id="sponOrder" class="auth-input" value="1" min="1" max="99">
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="closeModal('sponsorModal')">Cancel</button>
+                    <button type="submit" class="btn btn-gold btn-sm">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Sponsor
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </body>
 </html>

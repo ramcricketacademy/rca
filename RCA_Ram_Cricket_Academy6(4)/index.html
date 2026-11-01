@@ -214,10 +214,11 @@
             <nav class="nav-links" id="navLinks">
                 <a href="#home" class="nav-link active">Home</a>
                 <a href="#tournaments" class="nav-link">Tournaments</a>
-                <a href="#rrplSection" class="nav-link highlight-pill">RRPL 2026</a>
+                <a href="rrpl-registration.html" class="nav-link highlight-pill" style="color: var(--gold); font-weight: 700;"><i class="fa-solid fa-trophy" style="font-size: 0.8rem; margin-right: 4px;"></i> RRPL 2026</a>
                 <a href="#groundBooking" class="nav-link">Ground Booking</a>
                 <a href="#training" class="nav-link">Training</a>
                 <a href="#gallery" class="nav-link">Gallery</a>
+                <a href="#about" class="nav-link">About</a>
                 <a href="#contact" class="nav-link">Contact</a>
             </nav>
 
@@ -309,12 +310,14 @@
                 <nav class="sidebar-nav-links">
                     <a href="#home" class="sidebar-nav-item" onclick="closeRightSidebar()"><i class="fa-solid fa-house"></i> Home</a>
                     <a href="#tournaments" class="sidebar-nav-item" onclick="closeRightSidebar()"><i class="fa-solid fa-trophy"></i> Tournaments & Leagues</a>
-                    <a href="#rrplSection" class="sidebar-nav-item highlight-gold" onclick="closeRightSidebar()"><i class="fa-solid fa-medal"></i> RRPL 2026 (₹1,499 Trials)</a>
+                    <a href="rrpl-registration.html" class="sidebar-nav-item highlight-gold" onclick="closeRightSidebar()"><i class="fa-solid fa-trophy"></i> RRPL 2026 Registration</a>
                     <a href="#groundBooking" class="sidebar-nav-item" onclick="closeRightSidebar()"><i class="fa-solid fa-calendar-check"></i> Ground & Net Booking</a>
                     <a href="#training" class="sidebar-nav-item" onclick="closeRightSidebar()"><i class="fa-solid fa-baseball-bat-ball"></i> Training Programs</a>
                     <a href="#gallery" class="sidebar-nav-item" onclick="closeRightSidebar()"><i class="fa-solid fa-images"></i> Photo Showcase</a>
                     <a href="#updates" class="sidebar-nav-item" onclick="closeRightSidebar()"><i class="fa-solid fa-bullhorn"></i> Latest Notices & Updates</a>
-                    <a href="#about" class="sidebar-nav-item" onclick="closeRightSidebar()"><i class="fa-solid fa-id-card"></i> About Coach R.K. Chauhan</a>
+                    <a href="#about" class="sidebar-nav-item" onclick="closeRightSidebar(); switchAboutTab('coach');"><i class="fa-solid fa-users"></i> About RCA & Leadership</a>
+                    <a href="#about" class="sidebar-nav-item" style="padding-left: 28px; font-size: 0.85rem;" onclick="closeRightSidebar(); switchAboutTab('committee');"><i class="fa-solid fa-users-gear" style="font-size: 0.8rem;"></i> &bull; Management Committee</a>
+                    <a href="#about" class="sidebar-nav-item" style="padding-left: 28px; font-size: 0.85rem;" onclick="closeRightSidebar(); switchAboutTab('sponsors');"><i class="fa-solid fa-handshake" style="font-size: 0.8rem;"></i> &bull; Official Sponsorship</a>
                     <a href="#contact" class="sidebar-nav-item" onclick="closeRightSidebar()"><i class="fa-solid fa-envelope"></i> Contact & Location</a>
                 </nav>
             </div>
@@ -325,8 +328,8 @@
                 <div class="sidebar-address-box">
                     <i class="fa-solid fa-location-dot"></i>
                     <div>
-                        <strong>RCA Cricket Grounds</strong>
-                        <p>Panigaon Raya Road & Garun Govind Road, Vrindavan, Mathura (UP) - 281121</p>
+                        <strong>RCA Cricket Ground</strong>
+                        <p><a href="https://goo.gl/maps/JbRKLzuBDmZG7U68A" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline;">RCA Ground, Panigaon Raya Road, Vrindavan (Mathura)</a></p>
                         <small style="color: var(--gold-light);">Open Daily: 06:00 AM - 09:00 PM</small>
                     </div>
                 </div>
@@ -468,6 +471,37 @@
             <div class="tournaments-grid" id="tournamentsContainer">
                 <!-- Dynamically loaded from rcaDB -->
             </div>
+
+            <!-- Tournament Direct QR Payment Sidecard per User Request (Open Flexible Payment) -->
+            <div style="margin-top: 36px; background: linear-gradient(145deg, #1b042d 0%, #2a0746 100%); border: 2px solid var(--gold); border-radius: 18px; padding: 24px 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+                    <div style="flex: 1; min-width: 280px;">
+                        <span class="badge" style="background: rgba(212, 175, 55, 0.2); color: var(--gold-200); border: 1px solid var(--gold); padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 0.8rem;">
+                            OFFICIAL TOURNAMENT ENTRY & FEES
+                        </span>
+                        <h3 style="color: #fff; font-size: 1.5rem; margin-top: 8px;">Direct Tournament Entry Payment</h3>
+                        <p style="color: var(--text-muted); font-size: 0.92rem; margin-top: 4px; line-height: 1.5;">
+                            Registering team entry for RAM SPORTS CUP or official leagues? Scan the academy QR code or pay via official UPI ID. Enter fee amount in your UPI app according to the tournament.
+                        </p>
+                        <div class="upi-id-box" style="max-width: 380px; margin-top: 14px;">
+                            <div>
+                                <span style="font-size: 0.72rem; color: #94a3b8; display: block;">OFFICIAL UPI ID:</span>
+                                <span class="upi-id-text">ramsports6072@ybl</span>
+                            </div>
+                            <button type="button" class="btn-copy-upi" onclick="copyUpiId(this, 'ramsports6072@ybl')">
+                                <i class="fa-solid fa-copy"></i> Copy UPI
+                            </button>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                        <div style="width: 140px; height: 140px; background: #fff; border-radius: 12px; padding: 6px; border: 2px solid var(--gold); box-shadow: 0 6px 18px rgba(0,0,0,0.4);">
+                            <img src="assets/images/rca_open_qr.png" alt="RCA UPI QR Code" style="width: 100%; height: 100%; object-fit: contain;">
+                        </div>
+                        <span style="font-size: 0.75rem; color: var(--gold-200); margin-top: 6px; font-weight: 700;">Scan with PhonePe / GPay / Paytm</span>
+                        <span style="font-size: 0.7rem; color: #baa3d6; margin-top: 2px;">Enter fee amount in UPI app</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -480,8 +514,19 @@
                     RRPL 2026 — <span class="gold-text">Shri Radha Rani Premier League</span>
                 </h2>
                 <p class="section-desc">
-                    Open trials for all aspiring players. First prize ₹4 Lakhs, Scooty for Player of the Series, full stay and delicious food provided by the RRPL Committee!
+                    Open trials for all aspiring players. First prize ₹4 Lakhs, Runner-up ₹2 Lakhs, Scooty for Player of the Series, and live match telecast by the RRPL Committee!
                 </p>
+            </div>
+
+            
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="btn btn-sm btn-gold" onclick="shareRegistrationLink()">
+                        <i class="fa-solid fa-copy"></i> Copy Share Link
+                    </button>
+                    <a href="rrpl-registration.html" target="_blank" class="btn btn-sm btn-outline">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Dedicated Page
+                    </a>
+                </div>
             </div>
 
             <div class="booking-wrapper" style="margin-bottom: 40px;">
@@ -499,9 +544,8 @@
                         <span class="prize-pill featured"><i class="fa-solid fa-trophy"></i> Winner: ₹4,00,000</span>
                         <span class="prize-pill featured"><i class="fa-solid fa-medal"></i> Runner-up: ₹2,00,000</span>
                         <span class="prize-pill featured"><i class="fa-solid fa-motorcycle"></i> Player of Series: SCOOTY</span>
-                        <span class="prize-pill"><i class="fa-solid fa-hotel"></i> Good Stay Included</span>
-                        <span class="prize-pill"><i class="fa-solid fa-utensils"></i> Good Food Included</span>
                         <span class="prize-pill"><i class="fa-solid fa-tv"></i> Live Telecast</span>
+                        <span class="prize-pill"><i class="fa-solid fa-certificate"></i> Official Match Kit</span>
                     </div>
 
                     <div style="background: rgba(15, 3, 25, 0.6); border-left: 3px solid var(--gold); padding: 14px; border-radius: 6px; margin-top: 18px; font-size: 0.85rem; color: #d5cae6;">
@@ -509,11 +553,53 @@
                     </div>
                 </div>
 
-                <!-- RRPL Quick Trial Form -->
+                <!-- RRPL Quick Trial Form with Age Bracket, DOB Calculator & Fixed ₹1,499 Payment QR -->
                 <form class="booking-form" id="rrplTrialForm" onsubmit="handleRrplTrialSubmit(event)">
+                    <input type="hidden" id="rrplCategory" value="Under-16">
+
+                    <!-- Age Category Cards -->
+                    <div class="form-group form-full">
+                        <label style="font-size: 0.95rem; font-weight: 700; color: var(--gold-100); margin-bottom: 6px; display: block;">
+                            <i class="fa-solid fa-shield-halved" style="color: var(--gold);"></i> 1. Select Age Category *
+                        </label>
+                        <div class="category-selector-group" id="rrplCategoryGroup">
+                            <div class="category-card" data-category="Under-14" onclick="selectCategory('Under-14', 'rrpl')">
+                                <span class="category-tag">Under-14</span>
+                                <span class="category-sub">Junior (Born after 2012)</span>
+                            </div>
+                            <div class="category-card active" data-category="Under-16" onclick="selectCategory('Under-16', 'rrpl')">
+                                <span class="category-tag">Under-16</span>
+                                <span class="category-sub">Youth (Born 2010 - 2012)</span>
+                            </div>
+                            <div class="category-card" data-category="Under-19" onclick="selectCategory('Under-19', 'rrpl')">
+                                <span class="category-tag">Under-19</span>
+                                <span class="category-sub">Senior Draft (2007 - 2009)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Date of Birth & Live Age Calculator -->
+                    <div class="form-group">
+                        <label for="rrplDob"><i class="fa-solid fa-cake-candles" style="color: var(--gold);"></i> Date of Birth (DOB) *</label>
+                        <input type="date" id="rrplDob" class="form-control" onchange="handleDobChange(this.value, 'rrpl')" required>
+                        <div class="age-calc-box" id="rrplAgeBox">
+                            <span class="age-calc-result" id="rrplAgeResult">Select birth date</span>
+                            <span class="age-calc-badge" id="rrplAgeBadge"></span>
+                        </div>
+                        <div class="age-alert-msg age-alert-warning" id="rrplAgeAlert">
+                            <span id="rrplAgeAlertMsg"></span>
+                            <button type="button" class="age-switch-btn" id="rrplAgeSwitchBtn">Switch Category</button>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label for="rrplName">Player Full Name *</label>
                         <input type="text" id="rrplName" class="form-control" placeholder="e.g. Aarav Sharma" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rrplFather">Father's / Guardian's Name *</label>
+                        <input type="text" id="rrplFather" class="form-control" placeholder="e.g. Shri Rajesh Sharma" required>
                     </div>
 
                     <div class="form-group">
@@ -523,29 +609,14 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="rrplAge">Player Age *</label>
-                        <input type="number" id="rrplAge" class="form-control" placeholder="e.g. 17" min="12" max="50" required>
-                    </div>
-
-                    <div class="form-group">
                         <label for="rrplRole">Playing Specialty / Role *</label>
                         <select id="rrplRole" class="form-control" required>
                             <option value="Top Order Batsman">Top Order Batsman</option>
                             <option value="Middle Order Batsman">Middle Order Batsman</option>
                             <option value="Fast Bowler (Pace/Swing)">Fast Bowler (Pace/Swing)</option>
                             <option value="Spin Bowler">Spin Bowler</option>
-                            <option value="All-Rounder">All-Rounder</option>
+                            <option value="All-Rounder" selected>All-Rounder</option>
                             <option value="Wicketkeeper Batsman">Wicketkeeper Batsman</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="rrplPersons">Total Persons / Attendees *</label>
-                        <select id="rrplPersons" class="form-control" required>
-                            <option value="1 Player">1 Player (Individual)</option>
-                            <option value="2 Players">2 Players</option>
-                            <option value="3-5 Players">3 - 5 Players</option>
-                            <option value="Full Team / Group">Full Group (10+ Players)</option>
                         </select>
                     </div>
 
@@ -554,19 +625,54 @@
                         <input type="text" id="rrplCity" class="form-control" value="Vrindavan" required>
                     </div>
 
+                    <!-- Fixed ₹1,499 PhonePe QR Payment Card -->
                     <div class="form-group form-full">
-                        <div style="background: rgba(212, 175, 55, 0.1); border: 1px dashed var(--gold); padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <span style="font-size: 0.82rem; color: var(--gold-200); font-weight: 700;">RRPL TRIAL FEE:</span>
-                                <div style="font-size: 1.25rem; font-weight: 800; color: #fff;">₹ 1,499/-</div>
+                        <div class="payment-qr-card">
+                            <div class="payment-qr-header">
+                                <div>
+                                    <span style="font-size: 0.74rem; color: #baa3d6; font-weight: 700; text-transform: uppercase;">RRPL TRIAL FEE:</span>
+                                    <div class="payment-fee-badge">₹ 1,499/- ONLY</div>
+                                </div>
+                                <span class="payment-locked-pill"><i class="fa-solid fa-lock"></i> Fixed Non-Editable Amount</span>
                             </div>
-                            <span style="font-size: 0.78rem; color: #baa3d6;">Includes Food & Stay by Committee</span>
+
+                            <div class="payment-qr-body">
+                                <div class="payment-qr-img-wrap">
+                                    <img src="assets/images/rca_fixed_1499_qr.png" alt="RCA Fixed ₹1,499 Payment QR">
+                                    <span style="position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); background: #5f259f; color: #fff; font-size: 0.65rem; padding: 2px 8px; border-radius: 10px; font-weight: 800; white-space: nowrap;">
+                                        PhonePe • GPay • Paytm
+                                    </span>
+                                </div>
+
+                                <div class="payment-details-col">
+                                    <div class="upi-id-box">
+                                        <div>
+                                            <span style="font-size: 0.72rem; color: #94a3b8; display: block;">OFFICIAL UPI ID:</span>
+                                            <span class="upi-id-text">ramsports6072@ybl</span>
+                                        </div>
+                                        <button type="button" class="btn-copy-upi" onclick="copyUpiId(this, 'ramsports6072@ybl')">
+                                            <i class="fa-solid fa-copy"></i> Copy UPI
+                                        </button>
+                                    </div>
+
+                                    <a href="upi://pay?pa=ramsports6072@ybl&pn=Ram%20Sports%20Academy&am=1499.00&cu=INR&tn=RRPL%20Player%20Registration" class="btn-pay-upi-app">
+                                        <i class="fa-solid fa-mobile-screen-button"></i> Pay ₹1,499 via UPI App
+                                    </a>
+
+                                    <div>
+                                        <label for="rrplUtr" style="font-size: 0.86rem; color: var(--gold-100); font-weight: 700;">
+                                            <i class="fa-solid fa-receipt" style="color: var(--gold);"></i> UPI Transaction ID / UTR Number *
+                                        </label>
+                                        <input type="text" id="rrplUtr" class="form-control" placeholder="12-digit UTR (e.g. 4289XXXXXXXX)" required style="border-color: var(--gold); background: rgba(0,0,0,0.6);">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="form-group form-full" style="margin-top: 6px;">
-                        <button type="submit" class="btn btn-gold" style="width: 100%; font-size: 1.05rem; padding: 15px;">
-                            <i class="fa-solid fa-check"></i> Confirm Registration
+                        <button type="submit" class="btn btn-gold" style="width: 100%; font-size: 1.1rem; padding: 16px;">
+                            <i class="fa-solid fa-check"></i> Confirm Registration & Generate Trial Pass
                         </button>
                     </div>
                 </form>
@@ -627,6 +733,28 @@
                         </div>
                     </div>
 
+                    <div style="background: rgba(15, 3, 25, 0.75); border: 2px solid var(--gold); border-radius: 14px; padding: 18px; margin-top: 22px; text-align: center;">
+                        <span class="badge" style="background: rgba(212, 175, 55, 0.2); color: var(--gold-200); border: 1px solid var(--gold); padding: 3px 10px; border-radius: 16px; font-size: 0.75rem; font-weight: 700;">
+                            ONLINE BOOKING & ADVANCE PAYMENT
+                        </span>
+                        <div style="font-weight: 700; color: #fff; font-size: 1.05rem; margin-top: 6px;">Scan QR to Pay Booking Fee</div>
+                        <p style="font-size: 0.8rem; color: #baa3d6; margin-top: 3px;">
+                            Enter amount in your UPI app according to your practice slot or ground hire.
+                        </p>
+                        <div style="width: 130px; height: 130px; background: #fff; border-radius: 10px; padding: 6px; margin: 10px auto; border: 2px solid var(--gold); box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
+                            <img src="assets/images/rca_open_qr.png" alt="RCA Payment QR Code" style="width: 100%; height: 100%; object-fit: contain;">
+                        </div>
+                        <div class="upi-id-box" style="margin-top: 8px;">
+                            <div>
+                                <span style="font-size: 0.7rem; color: #94a3b8; display: block;">UPI ID:</span>
+                                <span class="upi-id-text" style="font-size: 0.85rem;">ramsports6072@ybl</span>
+                            </div>
+                            <button type="button" class="btn-copy-upi" onclick="copyUpiId(this, 'ramsports6072@ybl')">
+                                <i class="fa-solid fa-copy"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="coach-highlight-box">
                         <img src="assets/images/logo.png" alt="Coach R.K. Chauhan" class="coach-avatar">
                         <div>
@@ -654,13 +782,13 @@
 
                     <div class="form-group">
                         <label for="totalPersons">Total Persons / Players *</label>
-                        <select id="totalPersons" class="form-control" required>
-                            <option value="1 Player">1 Player (Individual Practice)</option>
+                        <select id="totalPersons" class="form-control" required onchange="handleInlineTotalPersonsChange(this.value)">
+                            <option value="1 Player (Individual Practice)">1 Player (Individual Practice)</option>
                             <option value="2 Players">2 Players</option>
-                            <option value="3-5 Players">3 - 5 Players (Net Group)</option>
+                            <option value="3-5 Players (Net Group)">3 - 5 Players (Net Group)</option>
                             <option value="6-10 Players">6 - 10 Players</option>
                             <option value="Full Team (11-15 Players)">Full Team (11 - 15 Players)</option>
-                            <option value="Both Teams (22+ Players)">Match Hire (Both Teams / 22+)</option>
+                            <option value="Both Teams (22+ Players)">Both Teams (22+ Players)</option>
                         </select>
                     </div>
 
@@ -671,15 +799,10 @@
 
                     <div class="form-group">
                         <label for="bookingType">Inquiry / Booking Type *</label>
-                        <select id="bookingType" class="form-control" required>
-                            <option value="RRPL Trial Registration (₹1,499)">RRPL Trial Registration (₹1,499)</option>
-                            <option value="RAM SPORTS CUP 7th (Team Entry ₹15,000)">RAM SPORTS CUP 7th (Team Entry ₹15,000)</option>
-                            <option value="Turf Net Practice Slot">Turf Net Practice Slot</option>
-                            <option value="Monthly Academy Admission">Monthly Academy Admission</option>
-                            <option value="Full Ground Match Booking">Full Ground Match Booking</option>
-                            <option value="Bowling Machine Practice">Bowling Machine Practice</option>
-                            <option value="Free Trial Session">Free Trial Session</option>
+                        <select id="bookingType" class="form-control" required onchange="handleBookingTypeSelectionChange(this.value, 'inline')">
+                            <!-- Populated dynamically from rcaDB.getBookingTypes() -->
                         </select>
+                        <div id="inlineBookingTypePriceBox"></div>
                     </div>
 
                     <div class="form-group">
@@ -702,6 +825,51 @@
                     <div class="form-group form-full">
                         <label for="playerRemarks">Special Requirements / Notes</label>
                         <textarea id="playerRemarks" class="form-control" placeholder="Batting/bowling preferences, gear requirements, or club details..."></textarea>
+                    </div>
+
+                    <!-- Fixed Amount Slot QR Payment Card with Admin Policy -->
+                    <div class="form-group form-full" style="background: linear-gradient(135deg, rgba(20, 4, 34, 0.9), rgba(12, 2, 20, 0.95)); border: 1.5px solid var(--gold); border-radius: 14px; padding: 16px; margin-top: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px dashed rgba(212, 175, 55, 0.3); padding-bottom: 8px;">
+                            <div>
+                                <span style="font-size: 0.72rem; color: #baa3d6; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;">SLOT PAYMENT VIA PHONEPE / UPI</span>
+                                <div id="inlineSlotTitleDisplay" style="font-size: 0.95rem; font-weight: 700; color: #fff;">Turf Net Practice Slot</div>
+                            </div>
+                            <span id="inlineSlotFeeBadge" style="background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; color: #4ade80; font-weight: 800; padding: 4px 10px; border-radius: 6px; font-size: 0.88rem;">
+                                Official Academy Rate
+                            </span>
+                        </div>
+
+                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+                            <div style="flex: 1; min-width: 200px;">
+                                <div class="upi-id-box" style="margin-top: 0; padding: 6px 10px;">
+                                    <div>
+                                        <span style="font-size: 0.68rem; color: #94a3b8; display: block;">OFFICIAL UPI ID:</span>
+                                        <span class="upi-id-text" style="font-size: 0.84rem;">ramsports6072@ybl</span>
+                                    </div>
+                                    <button type="button" class="btn-copy-upi" onclick="copyUpiId(this, 'ramsports6072@ybl')">
+                                        <i class="fa-solid fa-copy"></i> Copy
+                                    </button>
+                                </div>
+
+                                <a href="upi://pay?pa=ramsports6072@ybl&pn=Ram%20Sports%20Academy&cu=INR&tn=Slot%20Booking" id="inlineSlotPayAppBtn" class="btn-pay-upi-app" style="margin-top: 8px; padding: 9px 12px; font-size: 0.85rem;">
+                                    <i class="fa-solid fa-mobile-screen-button"></i> Pay via UPI App
+                                </a>
+                            </div>
+
+                            <div style="width: 110px; height: 110px; background: #fff; border-radius: 8px; padding: 4px; border: 2px solid var(--gold); flex-shrink: 0; margin: 0 auto; text-align: center; position: relative;">
+                                <img id="inlineSlotQrImg" src="assets/images/rca_open_qr.png" alt="RCA Slot QR" style="width: 100%; height: 100%; object-fit: contain;">
+                                <span style="position: absolute; bottom: -7px; left: 50%; transform: translateX(-50%); background: #5f259f; color: #fff; font-size: 0.6rem; padding: 1px 6px; border-radius: 8px; font-weight: 700; white-space: nowrap;">
+                                    PhonePe • GPay
+                                </span>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 14px;">
+                            <label for="playerUtr" id="inlinePlayerUtrLabel" style="font-size: 0.86rem; color: var(--gold-100); font-weight: 700;">
+                                <i class="fa-solid fa-receipt" style="color: var(--gold);"></i> UPI Transaction ID / UTR Number <span id="inlineSlotUtrReqBadge" style="color: #94a3b8; font-weight: 500;">(Optional)</span>
+                            </label>
+                            <input type="text" id="playerUtr" class="form-control" placeholder="12-digit UTR (e.g. 4289XXXXXXXX)" style="padding: 10px 12px; font-size: 0.88rem; border-color: var(--gold); background: rgba(0,0,0,0.6);">
+                        </div>
                     </div>
 
                     <div class="form-group form-full" style="margin-top: 10px;">
@@ -857,46 +1025,117 @@
         </div>
     </section>
 
-    <!-- About Coach RK Chauhan & Academy -->
+    <!-- About Section with Sub-Elements: 1. Coach R.K. Chauhan, 2. Committee, 3. Sponsorship -->
     <section class="about-section" id="about">
         <div class="container">
-            <div class="about-grid">
-                <div class="about-img-box">
-                    <img src="assets/images/logo.png" alt="Head Coach R.K. Chauhan - RCA Vrindavan">
-                    <div class="about-badge-exp">
-                        <div class="num">8+</div>
-                        <div class="label">Years of Mentorship</div>
+            <!-- Section Header -->
+            <div class="section-header" style="text-align: center; margin-bottom: 30px;">
+                <span class="section-pill"><i class="fa-solid fa-users"></i> Organization & Leadership</span>
+                <h2 class="section-title">About <span class="gold-text">Ram Cricket Academy</span></h2>
+                <p class="section-desc">
+                    Founded in 2018 with a dedication to grassroots discipline, state tournament infrastructure, and cricket mastery in Braj. Explore our visionary founder, executive leadership committee, and esteemed sponsors.
+                </p>
+            </div>
+
+            <!-- Sub-Elements Navigation Tabs -->
+            <div class="about-tabs-nav" role="tablist">
+                <button type="button" class="about-tab-btn active" id="aboutTabBtnCoach" onclick="switchAboutTab('coach')">
+                    <i class="fa-solid fa-user-tie"></i> 1. Coach R.K. Chauhan
+                </button>
+                <button type="button" class="about-tab-btn" id="aboutTabBtnCommittee" onclick="switchAboutTab('committee')">
+                    <i class="fa-solid fa-users-gear"></i> 2. Management Committee
+                </button>
+                <button type="button" class="about-tab-btn" id="aboutTabBtnSponsors" onclick="switchAboutTab('sponsors')">
+                    <i class="fa-solid fa-handshake"></i> 3. Official Sponsorship
+                </button>
+            </div>
+
+            <!-- SUB-ELEMENT 1: Coach R.K. Chauhan Profile -->
+            <div class="about-tab-content active" id="aboutTabContentCoach">
+                <div class="about-grid">
+                    <div class="about-img-box">
+                        <img id="aboutFounderImg" src="assets/images/logo.png" alt="Head Coach R.K. Chauhan - RCA Vrindavan">
+                        <div class="about-badge-exp">
+                            <div class="num" id="aboutFounderYears">8+</div>
+                            <div class="label">Years of Mentorship</div>
+                        </div>
+                    </div>
+
+                    <div class="about-info">
+                        <span class="section-pill"><i class="fa-solid fa-crown"></i> Academy Founder</span>
+                        <h3 id="aboutFounderName">Head Coach R.K. Chauhan</h3>
+                        <div class="coach-title" id="aboutFounderTitle">Founder, Senior Mentor & Biomechanics Specialist</div>
+                        
+                        <p id="aboutFounderBio">
+                            With dedicated grassroots coaching and match mentorship since 2018, <strong>Coach R.K. Chauhan</strong> established <strong>Ram Cricket Academy (RCA)</strong> with a mission: to provide international-standard cricket infrastructure, floodlit turf grounds, and major tournaments like <strong>RRPL 2026</strong> and the <strong>RAM SPORTS CUP</strong> in Vrindavan.
+                        </p>
+
+                        <p>
+                            Under Coach Chauhan's leadership, RCA operates professional cricket facilities at RCA Ground, Panigaon Raya Road, Vrindavan (Mathura).
+                        </p>
+
+                        <div style="background: rgba(36, 8, 60, 0.7); border-left: 3px solid var(--gold); padding: 14px 18px; border-radius: 4px; margin-bottom: 24px;">
+                            <em style="color: var(--gold-100); font-size: 0.95rem;" id="aboutFounderQuote">
+                                "Cricket demands commitment, technique, and a warrior mindset. Every child who enters RCA receives individual attention to unlock their true potential."
+                            </em>
+                            <div style="color: var(--gold); font-size: 0.8rem; font-weight: 700; margin-top: 6px;">— Coach R.K. Chauhan</div>
+                        </div>
+
+                        <div class="coach-social-links">
+                            <a id="aboutFounderInstaBtn" href="https://www.instagram.com/coach_rk.chauhan_officials?srtk=N3JqdmtlOGF2NHlk&utm_source=qr" target="_blank" rel="noopener" class="btn btn-purple btn-sm">
+                                <i class="fa-brands fa-instagram"></i> Follow on Instagram
+                            </a>
+                            <a id="aboutFounderPhoneBtn" href="tel:+919897517704" class="btn btn-gold btn-sm">
+                                <i class="fa-solid fa-phone"></i> +91 9897517704
+                            </a>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="about-info">
-                    <span class="section-pill">Academy Leadership</span>
-                    <h3>Head Coach R.K. Chauhan</h3>
-                    <div class="coach-title">Founder, Senior Mentor & Biomechanics Specialist</div>
-                    
-                    <p>
-                        With dedicated grassroots coaching and match mentorship since 2018, <strong>Coach R.K. Chauhan</strong> established <strong>Ram Cricket Academy (RCA)</strong> with a mission: to provide international-standard cricket infrastructure, floodlit turf grounds, and major tournaments like <strong>RRPL 2026</strong> and the <strong>RAM SPORTS CUP</strong> in Vrindavan.
+            <!-- SUB-ELEMENT 2: Management Committee -->
+            <div class="about-tab-content" id="aboutTabContentCommittee">
+                <div style="text-align: center; margin-bottom: 28px;">
+                    <h3 style="font-family: 'Cinzel', serif; color: #fff; font-size: 1.8rem; margin-bottom: 6px;">
+                        RCA Management & Coaching Committee
+                    </h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 680px; margin: 0 auto;">
+                        Meet the esteemed administrators, board president, academy owner, CEO, and certified coaches governing the administration, tournament operations, and high-performance training at Ram Cricket Academy.
                     </p>
+                </div>
 
-                    <p>
-                        Under Coach Chauhan's leadership, RCA operates multiple cricket grounds across Vrindavan: Panigaon Raya Road Ground, Garun Govind Road Ground, and matches at Hazarimal Somani Ground.
+                <div class="committee-grid" id="committeeCardsContainer">
+                    <!-- Populated dynamically from window.rcaDB.getCommittee() -->
+                </div>
+            </div>
+
+            <!-- SUB-ELEMENT 3: Official Sponsorship -->
+            <div class="about-tab-content" id="aboutTabContentSponsors">
+                <div style="text-align: center; margin-bottom: 28px;">
+                    <h3 style="font-family: 'Cinzel', serif; color: #fff; font-size: 1.8rem; margin-bottom: 6px;">
+                        Official Sponsors & Strategic Partners
+                    </h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 680px; margin: 0 auto;">
+                        We proudly collaborate with premier sports equipment brands, hospitality providers, and league sponsors dedicated to promoting junior cricket excellence and supporting champions across India.
                     </p>
+                </div>
 
-                    <div style="background: rgba(36, 8, 60, 0.7); border-left: 3px solid var(--gold); padding: 14px 18px; border-radius: 4px; margin-bottom: 24px;">
-                        <em style="color: var(--gold-100); font-size: 0.95rem;">
-                            "Cricket demands commitment, technique, and a warrior mindset. Every child who enters RCA receives individual attention to unlock their true potential."
-                        </em>
-                        <div style="color: var(--gold); font-size: 0.8rem; font-weight: 700; margin-top: 6px;">— Coach R.K. Chauhan</div>
-                    </div>
+                <div class="sponsors-grid" id="sponsorsCardsContainer">
+                    <!-- Populated dynamically from window.rcaDB.getSponsors() -->
+                </div>
 
-                    <div class="coach-social-links">
-                        <a href="https://www.instagram.com/coach_rk.chauhan_officials?srtk=N3JqdmtlOGF2NHlk&utm_source=qr" target="_blank" rel="noopener" class="btn btn-purple btn-sm">
-                            <i class="fa-brands fa-instagram"></i> Follow on Instagram
-                        </a>
-                        <a href="tel:+919897517704" class="btn btn-gold btn-sm">
-                            <i class="fa-solid fa-phone"></i> +91 9897517704
-                        </a>
-                    </div>
+                <!-- Sponsor CTA Card -->
+                <div class="sponsor-partner-cta-card">
+                    <span class="section-pill" style="margin-bottom: 10px; display: inline-block;"><i class="fa-solid fa-handshake-angle"></i> Partner With RCA</span>
+                    <h4 style="font-family: 'Cinzel', serif; font-size: 1.5rem; color: #fff; margin-bottom: 8px;">
+                        Interested in Sponsoring RCA Tournaments or Youth Programs?
+                    </h4>
+                    <p style="color: var(--text-muted); font-size: 0.92rem; max-width: 620px; margin: 0 auto 18px;">
+                        Connect with Coach R.K. Chauhan and the executive board for title sponsorships, brand placement on live streams, kit branding, and hospitality partnerships for RRPL 2026.
+                    </p>
+                    <a href="https://wa.me/919897517704?text=Hello%20Coach%20R.K.%20Chauhan,%20we%20are%20interested%20in%20an%20official%20sponsorship/partnership%20with%20Ram%20Cricket%20Academy." target="_blank" rel="noopener" class="btn btn-gold btn-sm">
+                        <i class="fa-brands fa-whatsapp"></i> Inquire for Sponsorship
+                    </a>
                 </div>
             </div>
         </div>
@@ -1007,8 +1246,15 @@
                         <div class="contact-item">
                             <div class="contact-icon"><i class="fa-solid fa-location-dot"></i></div>
                             <div class="contact-detail">
-                                <h4>Academy Grounds</h4>
-                                <p>1. RCA Ground, Panigaon Raya Road, Vrindavan (Mathura)<br>2. Garun Govind Road, Near Chhatikara, Vrindavan-281121<br>3. Matches at Hazarimal Somani Ground</p>
+                                <h4>Academy Ground Location</h4>
+                                <p style="margin-bottom: 4px;">
+                                    <a href="https://goo.gl/maps/JbRKLzuBDmZG7U68A" target="_blank" rel="noopener" style="color: #ffffff; text-decoration: none; font-weight: 700; font-size: 1.02rem; display: inline-block;">
+                                        RCA Ground, Panigaon Raya Road, Vrindavan (Mathura)
+                                    </a>
+                                </p>
+                                <a href="https://goo.gl/maps/JbRKLzuBDmZG7U68A" target="_blank" rel="noopener" class="btn btn-gold btn-sm" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; font-size: 0.8rem; margin-top: 4px;">
+                                    <i class="fa-solid fa-map-location-dot"></i> Open on Google Maps
+                                </a>
                             </div>
                         </div>
 
@@ -1023,14 +1269,23 @@
                 </div>
 
                 <!-- Google Map Embed -->
-                <div class="map-container">
+                <div class="map-container" style="position: relative;">
                     <iframe 
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14163.666324204435!2d77.67500000000001!3d27.5833333!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39736c5c0c978b6f%3A0xb36b5ec6325988ea!2sVrindavan%2C%20Uttar%20Pradesh!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" 
+                        src="https://maps.google.com/maps?q=RCA+Ground+Panigaon+Raya+Road+Vrindavan+Mathura&t=&z=15&ie=UTF8&iwloc=&output=embed" 
                         allowfullscreen="" 
                         loading="lazy" 
                         referrerpolicy="no-referrer-when-downgrade" 
-                        title="RCA Vrindavan Location Map">
+                        title="RCA Ground Panigaon Raya Road Vrindavan Location Map"
+                        style="width: 100%; height: 100%; border: 0;">
                     </iframe>
+                    <div style="position: absolute; bottom: 12px; left: 12px; right: 12px; background: rgba(9, 1, 17, 0.92); border: 1px solid var(--gold); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                        <span style="font-size: 0.84rem; color: #fff; font-weight: 600;">
+                            <i class="fa-solid fa-location-dot" style="color: var(--gold);"></i> RCA Ground, Panigaon Raya Road, Vrindavan (Mathura)
+                        </span>
+                        <a href="https://goo.gl/maps/JbRKLzuBDmZG7U68A" target="_blank" rel="noopener" class="btn btn-gold btn-sm" style="padding: 5px 12px; font-size: 0.78rem;">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Live Direction
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1075,7 +1330,9 @@
                         <li><a href="#groundBooking">Ground & Net Booking</a></li>
                         <li><a href="#training">Training Programs</a></li>
                         <li><a href="#gallery">Photo Gallery</a></li>
-                        <li><a href="#about">About Coach Chauhan</a></li>
+                        <li><a href="#about" onclick="switchAboutTab('coach');">About Coach Chauhan</a></li>
+                        <li><a href="#about" onclick="switchAboutTab('committee');">Management Committee</a></li>
+                        <li><a href="#about" onclick="switchAboutTab('sponsors');">Official Sponsorship</a></li>
                     </ul>
                 </div>
 
@@ -1102,7 +1359,7 @@
                         <i class="fa-solid fa-envelope" style="color: var(--gold); margin-right: 6px;"></i> RCAACADEMY9897@gmail.com
                     </p>
                     <p style="font-size: 0.9rem; margin-bottom: 16px;">
-                        <i class="fa-solid fa-location-dot" style="color: var(--gold); margin-right: 6px;"></i> Panigaon Raya Rd, Vrindavan
+                        <a href="https://goo.gl/maps/JbRKLzuBDmZG7U68A" target="_blank" rel="noopener" style="color: inherit; text-decoration: none;"><i class="fa-solid fa-location-dot" style="color: var(--gold); margin-right: 6px;"></i> RCA Ground, Panigaon Raya Road, Vrindavan (Mathura)</a>
                     </p>
                     <a href="admin.html" class="btn btn-outline btn-sm" style="display: inline-block;">
                         <i class="fa-solid fa-shield-halved"></i> Admin Portal
@@ -1136,6 +1393,236 @@
     </div>
 
     <!-- Dedicated Slot & Registration Booking Popup Modal (User Requested) -->
+    <!-- ======================================================================
+         ACADEMY ADMISSIONS ENTRANCE POPUP MODAL (GPL STYLE per User Request)
+         ====================================================================== -->
+    <div class="modal-backdrop" id="admissionWelcomePopup">
+        <div class="modal-box gpl-entrance-modal-box">
+            <div class="gpl-modal-grid">
+                <!-- Left Column (Teal/Emerald Cricket Gradient) -->
+                <div class="gpl-modal-left">
+                    <div class="gpl-left-badge">RCA</div>
+                    <div class="gpl-left-content">
+                        <span class="gpl-left-pill">PLAYER ADMISSIONS 2026</span>
+                        <h2 class="gpl-left-title">Your Cricket Journey Starts Here.</h2>
+                        <p class="gpl-left-desc">
+                            Train with purpose. Compete with confidence. Grow with RCA.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right Column (Deep Dark Sleek Panel) -->
+                <div class="gpl-modal-right">
+                    <button class="modal-close" onclick="closeAdmissionPopup()" style="position: absolute; top: 16px; right: 18px; color: #94a3b8; font-size: 1.8rem;" aria-label="Close Popup">&times;</button>
+                    
+                    <div class="gpl-right-icon">
+                        <i class="fa-solid fa-baseball-bat-ball"></i>
+                    </div>
+
+                    <span class="gpl-right-subtitle">RAM CRICKET ACADEMY • VRINDAVAN</span>
+                    <h3 class="gpl-right-title">Player Registration <span>Now Open</span></h3>
+                    <p class="gpl-right-desc">
+                        Join Ram Cricket Academy and become part of professional training, competitive matches, and premier tournaments.
+                    </p>
+
+                    <ul class="gpl-checklist">
+                        <li class="gpl-check-item">
+                            <span class="gpl-check-badge"><i class="fa-solid fa-check"></i></span>
+                            <span>Professional Cricket Training</span>
+                        </li>
+                        <li class="gpl-check-item">
+                            <span class="gpl-check-badge"><i class="fa-solid fa-check"></i></span>
+                            <span>Tournament & League Opportunities</span>
+                        </li>
+                        <li class="gpl-check-item">
+                            <span class="gpl-check-badge"><i class="fa-solid fa-check"></i></span>
+                            <span>Match Turf Ground Experience</span>
+                        </li>
+                    </ul>
+
+                    <div class="gpl-btn-group">
+                        <button type="button" class="gpl-btn-register" onclick="openAdmissionRegistrationModal()">
+                            Register Now <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                        <button type="button" class="gpl-btn-later" onclick="closeAdmissionPopup()">
+                            Maybe Later
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================================================================
+         FULL ADMISSION & TRIALS REGISTRATION MODAL (Under-14 / 16 / 19 & ₹1,499 QR)
+         ====================================================================== -->
+    <div class="modal-backdrop" id="admissionRegistrationModal">
+        <div class="modal-box" style="max-width: 760px; padding: 34px 28px;">
+            <button class="modal-close" onclick="closeModal('admissionRegistrationModal')">&times;</button>
+            
+            <div style="text-align: center; margin-bottom: 24px; border-bottom: 1px dashed rgba(212, 175, 55, 0.3); padding-bottom: 16px;">
+                <span class="section-pill" style="font-size: 0.75rem; padding: 4px 14px; margin-bottom: 8px;">ACADEMY ADMISSIONS & TRIALS 2026</span>
+                <h3 style="font-size: 1.85rem; color: #fff; margin-top: 6px;">
+                    Player Registration <span class="gold-text">Now Open</span>
+                </h3>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">
+                    Select your age bracket (Under-14 / 16 / 19), complete the form, and scan the fixed ₹1,499 QR code.
+                </p>
+            </div>
+
+            <form class="booking-form" id="admissionRegistrationForm" onsubmit="handleAdmissionRegistrationSubmit(event, 'adm')">
+                <input type="hidden" id="admCategory" name="category" value="Under-16">
+
+                <!-- 1. AGE CATEGORY SELECTION -->
+                <div class="form-group form-full">
+                    <label style="font-size: 0.95rem; font-weight: 700; color: var(--gold-100); margin-bottom: 8px; display: block;">
+                        <i class="fa-solid fa-shield-halved" style="color: var(--gold);"></i> 1. Select Your Age Category *
+                    </label>
+                    <div class="category-selector-group" id="admCategoryGroup">
+                        <div class="category-card" data-category="Under-14" onclick="selectCategory('Under-14', 'adm')">
+                            <span class="category-tag">Under-14</span>
+                            <span class="category-sub">Junior (Born after 2012)</span>
+                        </div>
+                        <div class="category-card active" data-category="Under-16" onclick="selectCategory('Under-16', 'adm')">
+                            <span class="category-tag">Under-16</span>
+                            <span class="category-sub">Youth (Born 2010 - 2012)</span>
+                        </div>
+                        <div class="category-card" data-category="Under-19" onclick="selectCategory('Under-19', 'adm')">
+                            <span class="category-tag">Under-19</span>
+                            <span class="category-sub">Senior Draft (2007 - 2009)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. DATE OF BIRTH & LIVE AGE CALCULATOR -->
+                <div class="form-group">
+                    <label for="admDob"><i class="fa-solid fa-cake-candles" style="color: var(--gold);"></i> Date of Birth (DOB) *</label>
+                    <input type="date" id="admDob" class="form-control" onchange="handleDobChange(this.value, 'adm')" required>
+                    
+                    <div class="age-calc-box" id="admAgeBox">
+                        <span class="age-calc-result" id="admAgeResult">Select birth date</span>
+                        <span class="age-calc-badge" id="admAgeBadge"></span>
+                    </div>
+
+                    <div class="age-alert-msg age-alert-warning" id="admAgeAlert">
+                        <span id="admAgeAlertMsg"></span>
+                        <button type="button" class="age-switch-btn" id="admAgeSwitchBtn">Switch Category</button>
+                    </div>
+                </div>
+
+                <!-- PLAYER FULL NAME -->
+                <div class="form-group">
+                    <label for="admName"><i class="fa-solid fa-user" style="color: var(--gold);"></i> Player Full Name *</label>
+                    <input type="text" id="admName" class="form-control" placeholder="e.g. Aarav Sharma" required>
+                </div>
+
+                <!-- FATHER'S / GUARDIAN'S NAME -->
+                <div class="form-group">
+                    <label for="admFather"><i class="fa-solid fa-user-group" style="color: var(--gold);"></i> Father's / Guardian's Name *</label>
+                    <input type="text" id="admFather" class="form-control" placeholder="e.g. Shri Rajesh Sharma" required>
+                </div>
+
+                <!-- PHONE / WHATSAPP NUMBER -->
+                <div class="form-group">
+                    <label for="admPhone"><i class="fa-solid fa-phone" style="color: var(--gold);"></i> Mobile / WhatsApp Number *</label>
+                    <input type="tel" id="admPhone" class="form-control" placeholder="10-digit Mobile No." pattern="[0-9]{10}" maxlength="10" inputmode="numeric" required>
+                    <div id="admPhoneError" class="phone-error-hint" style="font-size: 0.8rem; margin-top: 4px; display: none;"></div>
+                </div>
+
+                <!-- PLAYING SPECIALTY / ROLE -->
+                <div class="form-group">
+                    <label for="admRole"><i class="fa-solid fa-baseball-bat-ball" style="color: var(--gold);"></i> Playing Specialty / Role *</label>
+                    <select id="admRole" class="form-control" required>
+                        <option value="Top Order Batsman">Top Order Batsman</option>
+                        <option value="Middle Order Batsman">Middle Order Batsman</option>
+                        <option value="Wicketkeeper Batsman">Wicketkeeper Batsman</option>
+                        <option value="Fast Bowler (Pace/Swing)">Fast Bowler (Pace/Swing)</option>
+                        <option value="Spin Bowler">Spin Bowler</option>
+                        <option value="All-Rounder" selected>All-Rounder (Batting & Bowling)</option>
+                    </select>
+                </div>
+
+                <!-- BATTING & BOWLING STYLE -->
+                <div class="form-group">
+                    <label for="admBatting"><i class="fa-solid fa-hand-fist" style="color: var(--gold);"></i> Batting Hand</label>
+                    <select id="admBatting" class="form-control">
+                        <option value="Right-Hand Bat" selected>Right-Hand Bat</option>
+                        <option value="Left-Hand Bat">Left-Hand Bat</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="admBowling"><i class="fa-solid fa-bowling-ball" style="color: var(--gold);"></i> Bowling Style</label>
+                    <select id="admBowling" class="form-control">
+                        <option value="Right-Arm Fast / Medium" selected>Right-Arm Fast / Medium</option>
+                        <option value="Right-Arm Spin (Off/Leg)">Right-Arm Spin (Off/Leg)</option>
+                        <option value="Left-Arm Fast">Left-Arm Fast</option>
+                        <option value="Left-Arm Spin">Left-Arm Spin</option>
+                        <option value="Wicket-Keeping / None">Wicket-Keeping / None</option>
+                    </select>
+                </div>
+
+                <!-- CITY / HOMETOWN -->
+                <div class="form-group">
+                    <label for="admCity"><i class="fa-solid fa-location-dot" style="color: var(--gold);"></i> City / Hometown *</label>
+                    <input type="text" id="admCity" class="form-control" value="Vrindavan" required>
+                </div>
+
+                <!-- FIXED ₹1,499 PAYMENT & PHONEPE QR CARD -->
+                <div class="form-group form-full">
+                    <div class="payment-qr-card">
+                        <div class="payment-qr-header">
+                            <div>
+                                <span style="font-size: 0.74rem; color: #baa3d6; font-weight: 700; text-transform: uppercase;">REGISTRATION & TRIAL FEE</span>
+                                <div class="payment-fee-badge">₹ 1,499/- ONLY</div>
+                            </div>
+                            <span class="payment-locked-pill"><i class="fa-solid fa-lock"></i> Fixed Non-Editable Amount</span>
+                        </div>
+
+                        <div class="payment-qr-body">
+                            <div class="payment-qr-img-wrap">
+                                <img src="assets/images/rca_fixed_1499_qr.png" alt="RCA Fixed ₹1,499 Payment QR">
+                                <span style="position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); background: #5f259f; color: #fff; font-size: 0.65rem; padding: 2px 8px; border-radius: 10px; font-weight: 800; white-space: nowrap;">
+                                    PhonePe • GPay • Paytm
+                                </span>
+                            </div>
+
+                            <div class="payment-details-col">
+                                <div class="upi-id-box">
+                                    <div>
+                                        <span style="font-size: 0.72rem; color: #94a3b8; display: block;">OFFICIAL UPI ID:</span>
+                                        <span class="upi-id-text">ramsports6072@ybl</span>
+                                    </div>
+                                    <button type="button" class="btn-copy-upi" onclick="copyUpiId(this, 'ramsports6072@ybl')">
+                                        <i class="fa-solid fa-copy"></i> Copy UPI
+                                    </button>
+                                </div>
+
+                                <a href="upi://pay?pa=ramsports6072@ybl&pn=Ram%20Sports%20Academy&am=1499.00&cu=INR&tn=RCA%20Player%20Registration" class="btn-pay-upi-app">
+                                    <i class="fa-solid fa-mobile-screen-button"></i> Pay ₹1,499 via UPI App
+                                </a>
+
+                                <div>
+                                    <label for="admUtr" style="font-size: 0.86rem; color: var(--gold-100); font-weight: 700;">
+                                        <i class="fa-solid fa-receipt" style="color: var(--gold);"></i> UPI Transaction ID / UTR Number *
+                                    </label>
+                                    <input type="text" id="admUtr" class="form-control" placeholder="12-digit UTR (e.g. 4289XXXXXXXX)" required style="border-color: var(--gold); background: rgba(0,0,0,0.6);">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBMIT BUTTON -->
+                <div class="form-group form-full" style="margin-top: 10px;">
+                    <button type="submit" class="btn btn-gold" style="width: 100%; font-size: 1.12rem; padding: 16px;">
+                        <i class="fa-solid fa-check"></i> Submit Registration & Generate Pass (₹1,499)
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="modal-backdrop" id="slotBookingModal">
         <div class="modal-box" style="max-width: 640px; padding: 32px 28px;">
             <button class="modal-close" onclick="closeModal('slotBookingModal')">&times;</button>
@@ -1164,13 +1651,13 @@
 
                 <div class="form-group">
                     <label for="popupTotalPersons"><i class="fa-solid fa-users"></i> Total Persons / Players *</label>
-                    <select id="popupTotalPersons" class="form-control" required>
-                        <option value="1 Player">1 Player (Individual Practice)</option>
+                    <select id="popupTotalPersons" class="form-control" required onchange="handlePopupTotalPersonsChange(this.value)">
+                        <option value="1 Player (Individual Practice)">1 Player (Individual Practice)</option>
                         <option value="2 Players">2 Players</option>
-                        <option value="3-5 Players">3 - 5 Players (Net Group)</option>
+                        <option value="3-5 Players (Net Group)">3 - 5 Players (Net Group)</option>
                         <option value="6-10 Players">6 - 10 Players</option>
                         <option value="Full Team (11-15 Players)">Full Team (11 - 15 Players)</option>
-                        <option value="Both Teams (22+ Players)">Match Hire (Both Teams / 22+)</option>
+                        <option value="Both Teams (22+ Players)">Both Teams (22+ Players)</option>
                     </select>
                 </div>
 
@@ -1181,9 +1668,10 @@
 
                 <div class="form-group">
                     <label for="popupBookingType"><i class="fa-solid fa-trophy"></i> Inquiry / Booking Type *</label>
-                    <select id="popupBookingType" class="form-control" required>
+                    <select id="popupBookingType" class="form-control" required onchange="handleBookingTypeSelectionChange(this.value, 'popup')">
                         <!-- Populated dynamically from rcaDB.getBookingTypes() -->
                     </select>
+                    <div id="popupBookingTypePriceBox"></div>
                 </div>
 
                 <div class="form-group">
@@ -1204,6 +1692,51 @@
                 <div class="form-group form-full">
                     <label for="popupPlayerRemarks"><i class="fa-solid fa-message"></i> Special Requirements / Notes</label>
                     <textarea id="popupPlayerRemarks" class="form-control" placeholder="Batting/bowling preferences, gear requirements, or club details..."></textarea>
+                </div>
+
+                <!-- Fixed Amount Slot QR Payment Card with Admin Policy -->
+                <div class="form-group form-full" style="background: linear-gradient(135deg, rgba(20, 4, 34, 0.9), rgba(12, 2, 20, 0.95)); border: 1.5px solid var(--gold); border-radius: 14px; padding: 16px; margin-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px dashed rgba(212, 175, 55, 0.3); padding-bottom: 8px;">
+                        <div>
+                            <span style="font-size: 0.72rem; color: #baa3d6; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;">SLOT PAYMENT VIA PHONEPE / UPI</span>
+                            <div id="popupSlotTitleDisplay" style="font-size: 0.95rem; font-weight: 700; color: #fff;">Turf Net Practice Slot</div>
+                        </div>
+                        <span id="popupSlotFeeBadge" style="background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; color: #4ade80; font-weight: 800; padding: 4px 10px; border-radius: 6px; font-size: 0.88rem;">
+                            Official Academy Rate
+                        </span>
+                    </div>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <div class="upi-id-box" style="margin-top: 0; padding: 6px 10px;">
+                                <div>
+                                    <span style="font-size: 0.68rem; color: #94a3b8; display: block;">OFFICIAL UPI ID:</span>
+                                    <span class="upi-id-text" style="font-size: 0.84rem;">ramsports6072@ybl</span>
+                                </div>
+                                <button type="button" class="btn-copy-upi" onclick="copyUpiId(this, 'ramsports6072@ybl')">
+                                    <i class="fa-solid fa-copy"></i> Copy
+                                </button>
+                            </div>
+
+                            <a href="upi://pay?pa=ramsports6072@ybl&pn=Ram%20Sports%20Academy&cu=INR&tn=Slot%20Booking" id="popupSlotPayAppBtn" class="btn-pay-upi-app" style="margin-top: 8px; padding: 9px 12px; font-size: 0.85rem;">
+                                <i class="fa-solid fa-mobile-screen-button"></i> Pay via UPI App
+                            </a>
+                        </div>
+
+                        <div style="width: 110px; height: 110px; background: #fff; border-radius: 8px; padding: 4px; border: 2px solid var(--gold); flex-shrink: 0; margin: 0 auto; text-align: center; position: relative;">
+                            <img id="popupSlotQrImg" src="assets/images/rca_open_qr.png" alt="RCA Slot QR" style="width: 100%; height: 100%; object-fit: contain;">
+                            <span style="position: absolute; bottom: -7px; left: 50%; transform: translateX(-50%); background: #5f259f; color: #fff; font-size: 0.6rem; padding: 1px 6px; border-radius: 8px; font-weight: 700; white-space: nowrap;">
+                                PhonePe • GPay
+                            </span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 14px;">
+                        <label for="popupPlayerUtr" id="popupPlayerUtrLabel" style="font-size: 0.86rem; color: var(--gold-100); font-weight: 700;">
+                            <i class="fa-solid fa-receipt" style="color: var(--gold);"></i> UPI Transaction ID / UTR Number <span id="popupSlotUtrReqBadge" style="color: #94a3b8; font-weight: 500;">(Optional)</span>
+                        </label>
+                        <input type="text" id="popupPlayerUtr" class="form-control" placeholder="12-digit UTR (e.g. 4289XXXXXXXX)" style="padding: 10px 12px; font-size: 0.88rem; border-color: var(--gold); background: rgba(0,0,0,0.6);">
+                    </div>
                 </div>
 
                 <div class="form-group form-full" style="margin-top: 10px;">

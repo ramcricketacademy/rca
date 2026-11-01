@@ -143,26 +143,38 @@ class RcaSupabaseManager {
                 rawRows = data;
             }
 
-            return (rawRows || []).map(b => ({
-                id: b.id,
-                name: b.name,
-                phone: b.phone,
-                email: b.email,
-                city: b.city,
-                age: b.age,
-                fatherName: b.father_name,
-                role: b.role,
-                totalPersons: b.total_persons,
-                bookingType: b.booking_type,
-                formType: b.form_type || 'slot_booking',
-                slotDate: b.slot_date,
-                timeSlot: b.time_slot,
-                facilityType: b.facility_type,
-                status: b.status,
-                remarks: b.remarks,
-                formData: b.form_data || {},
-                createdAt: new Date(b.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
-            }));
+            return (rawRows || []).map(b => {
+                const ft = (b.form_type || '').toLowerCase();
+                const bt = (b.booking_type || '').toLowerCase();
+                const isExplicitSlot = ft.includes('slot') || ft.includes('ground') || bt.includes('slot') || bt.includes('net practice');
+                const inferredCategory = isExplicitSlot ? '' : (b.category || (b.form_data && b.form_data.category) || (bt.includes('under') ? b.booking_type : ''));
+
+                return {
+                    id: b.id,
+                    name: b.name,
+                    phone: b.phone,
+                    email: b.email,
+                    city: b.city,
+                    age: b.age,
+                    fatherName: b.father_name || (b.form_data && b.form_data.fatherName) || '-',
+                    role: b.role,
+                    totalPersons: b.total_persons,
+                    bookingType: b.booking_type,
+                    formType: b.form_type || (isExplicitSlot ? 'slot_booking' : 'academy_admission'),
+                    slotDate: b.slot_date,
+                    timeSlot: b.time_slot,
+                    facilityType: b.facility_type,
+                    status: b.status,
+                    remarks: b.remarks,
+                    category: inferredCategory,
+                    dob: b.dob || (b.form_data && b.form_data.dob) || '',
+                    utrNumber: b.utr_number || (b.form_data && b.form_data.utrNumber) || '',
+                    feeAmount: b.fee_amount || (b.form_data && b.form_data.feeAmount) || (isExplicitSlot ? '' : '1499'),
+                    paymentStatus: b.payment_status || (b.form_data && b.form_data.paymentStatus) || (b.utr_number ? 'Pending Verification' : 'New'),
+                    formData: b.form_data || {},
+                    createdAt: new Date(b.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
+                };
+            });
         } catch (e) {
             console.warn("[RCA Supabase] fetchBookings error:", e);
             return [];
@@ -172,7 +184,17 @@ class RcaSupabaseManager {
     async insertBooking(b) {
         if (!this.isConfigured()) return null;
         try {
-            const payload = {
+            const ft = (b.formType || '').toLowerCase();
+            const bt = (b.bookingType || '').toLowerCase();
+            const isExplicitSlot = ft.includes('slot') || ft.includes('ground') || bt.includes('slot') || bt.includes('net practice');
+            const isAdmission = !isExplicitSlot && (ft === 'academy_admission' || ft === 'rrpl_trials' || bt.includes('admission') || bt.includes('rrpl') || bt.includes('trial'));
+
+            const category = isExplicitSlot ? '' : (b.category || (isAdmission ? 'Under-16' : ''));
+            const utr = b.utrNumber || '';
+            const fee = b.feeAmount || (isAdmission ? '1499' : '');
+            const dob = b.dob || '';
+
+            const basePayload = {
                 id: b.id,
                 name: b.name,
                 phone: b.phone,
@@ -180,23 +202,50 @@ class RcaSupabaseManager {
                 city: b.city || 'Vrindavan',
                 age: String(b.age || '-'),
                 father_name: b.fatherName || '-',
-                role: b.role || 'Player',
-                total_persons: b.totalPersons || '1 Player',
-                booking_type: b.bookingType || 'Practice Slot',
-                form_type: b.formType || 'slot_booking',
-                slot_date: b.slotDate || '',
-                time_slot: b.timeSlot || '',
+                role: b.role || (isExplicitSlot ? 'Player / Team' : 'Player'),
+                total_persons: b.totalPersons || (category ? category : '1 Player'),
+                booking_type: b.bookingType || (isAdmission ? `RCA Trials (${category})` : 'Practice Slot'),
+                form_type: b.formType || (isExplicitSlot ? 'slot_booking' : 'academy_admission'),
+                slot_date: b.slotDate || new Date().toISOString().split('T')[0],
+                time_slot: b.timeSlot || 'Flexible Time',
                 facility_type: b.facilityType || 'Turf Pitch',
                 status: b.status || 'New',
-                remarks: b.remarks || '',
-                form_data: b.formData || {}
+                remarks: b.remarks || (utr ? `UPI UTR: ${utr} | Fee: ₹${fee}` : ''),
+                form_data: {
+                    ...(b.formData || {}),
+                    category: category,
+                    dob: dob,
+                    fatherName: b.fatherName || '-',
+                    utrNumber: utr,
+                    feeAmount: fee,
+                    paymentStatus: b.paymentStatus || (utr ? 'Pending Verification' : 'New'),
+                    submittedAt: new Date().toISOString()
+                }
             };
 
-            const { error } = await this.client
-                .from('bookings')
-                .insert([payload]);
+            // Attempt insert with specific category/payment columns if available in DB
+            const extendedPayload = {
+                ...basePayload,
+                category: category,
+                dob: dob,
+                utr_number: utr,
+                fee_amount: fee,
+                payment_status: b.paymentStatus || (utr ? 'Pending Verification' : 'New')
+            };
 
-            if (error) throw error;
+            const { error: fullError } = await this.client
+                .from('bookings')
+                .insert([extendedPayload]);
+
+            if (!fullError) return true;
+
+            // Graceful fallback to base payload if columns are not yet added to Supabase table
+            console.warn("[RCA Supabase] Fallback to base booking schema:", fullError.message);
+            const { error: baseError } = await this.client
+                .from('bookings')
+                .insert([basePayload]);
+
+            if (baseError) throw baseError;
             return true;
         } catch (e) {
             console.error("[RCA Supabase] insertBooking error:", e);
@@ -345,6 +394,33 @@ class RcaSupabaseManager {
         }
     }
 
+    async updateTournamentFees(id, fees, adminToken = null) {
+        if (!this.isConfigured()) return null;
+        const token = this.getAdminToken(adminToken);
+        const payload = {
+            trial_fee: parseInt(fees.trialFee) || 0,
+            team_fee: parseInt(fees.teamFee) || 0,
+            fee_label: fees.feeLabel || 'Registration Open'
+        };
+        try {
+            if (token) {
+                const { error: rpcError } = await this.client.rpc('rca_admin_update', {
+                    p_table: 'tournaments',
+                    p_id: id,
+                    p_payload: payload,
+                    p_admin_token: token
+                });
+                if (!rpcError) return true;
+            }
+            const { error } = await this.client.from('tournaments').update(payload).eq('id', id);
+            if (error) throw error;
+            return true;
+        } catch (e) {
+            console.error("[RCA Supabase] updateTournamentFees error:", e);
+            return false;
+        }
+    }
+
     async deleteTournament(id, adminToken = null) {
         if (!this.isConfigured()) return null;
         const token = this.getAdminToken(adminToken);
@@ -381,9 +457,11 @@ class RcaSupabaseManager {
                 title: s.title,
                 time: s.time,
                 facility: s.facility,
-                price: s.price,
-                isAvailable: s.is_available,
-                amenities: s.amenities || [],
+                price: parseInt(s.price) || 1500,
+                isAvailable: s.is_available !== false,
+                amenities: Array.isArray(s.amenities) ? s.amenities : [],
+                qrImage: s.qr_image || "",
+                personPrices: (s.extra_data && s.extra_data.personPrices) || s.person_prices || {},
                 extraData: s.extra_data || {}
             }));
         } catch (e) {
@@ -423,9 +501,10 @@ class RcaSupabaseManager {
             title: s.title,
             time: s.time,
             facility: s.facility,
-            price: s.price,
+            price: parseInt(s.price) || 1500,
             is_available: s.isAvailable !== false,
-            amenities: s.amenities || [],
+            amenities: Array.isArray(s.amenities) ? s.amenities : ["Turf Pitch", "Coach Supervision"],
+            qr_image: s.qrImage || "",
             extra_data: s.extraData || {}
         };
 
@@ -437,6 +516,7 @@ class RcaSupabaseManager {
                     p_admin_token: token
                 });
                 if (!rpcError) return true;
+                console.warn("[RCA Supabase] rca_admin_insert error:", rpcError);
             }
 
             const { error } = await this.client.from('slots').insert([payload]);
@@ -445,6 +525,51 @@ class RcaSupabaseManager {
         } catch (e) {
             console.error("[RCA Supabase] insertSlot error:", e);
             return null;
+        }
+    }
+
+    async updateSlotPrice(id, price, adminToken = null) {
+        if (!this.isConfigured()) return null;
+        const token = this.getAdminToken(adminToken);
+        const numPrice = parseInt(price) || 0;
+        try {
+            if (token) {
+                const { error: rpcError } = await this.client.rpc('rca_admin_update', {
+                    p_table: 'slots',
+                    p_id: id,
+                    p_payload: { price: numPrice },
+                    p_admin_token: token
+                });
+                if (!rpcError) return true;
+            }
+            const { error } = await this.client.from('slots').update({ price: numPrice }).eq('id', id);
+            if (error) throw error;
+            return true;
+        } catch (e) {
+            console.error("[RCA Supabase] updateSlotPrice error:", e);
+            return false;
+        }
+    }
+
+    async updateSlotPersonPrices(id, personPrices, adminToken = null) {
+        if (!this.isConfigured()) return null;
+        const token = this.getAdminToken(adminToken);
+        try {
+            if (token) {
+                const { error: rpcError } = await this.client.rpc('rca_admin_update', {
+                    p_table: 'slots',
+                    p_id: id,
+                    p_payload: { extra_data: { personPrices } },
+                    p_admin_token: token
+                });
+                if (!rpcError) return true;
+            }
+            const { error } = await this.client.from('slots').update({ extra_data: { personPrices } }).eq('id', id);
+            if (error) throw error;
+            return true;
+        } catch (e) {
+            console.error("[RCA Supabase] updateSlotPersonPrices error:", e);
+            return false;
         }
     }
 
@@ -623,38 +748,74 @@ class RcaSupabaseManager {
     }
 
     // -------------------------------------------------------------------------
-    // 6. BOOKING CATEGORIES (Dynamic Dropdown List)
+    // 6. BOOKING CATEGORIES & DYNAMIC PRICING
     // -------------------------------------------------------------------------
     async fetchBookingTypes() {
         if (!this.isConfigured()) return null;
         try {
-            const { data, error } = await this.client.from('booking_types').select('name').eq('is_active', true);
+            const { data, error } = await this.client.from('booking_types').select('name, price, label').eq('is_active', true);
             if (error) throw error;
-            return data.map(t => t.name);
+            return data.map(t => ({
+                name: t.name,
+                price: parseInt(t.price) || 0,
+                label: t.label || ''
+            }));
         } catch (e) {
             console.warn("[RCA Supabase] fetchBookingTypes error:", e);
             return null;
         }
     }
 
-    async insertBookingType(name, adminToken = null) {
+    async insertBookingType(name, price = 0, label = '', adminToken = null) {
         if (!this.isConfigured()) return null;
         const token = this.getAdminToken(adminToken);
+        const payload = {
+            name,
+            price: parseInt(price) || 0,
+            label: label || ''
+        };
         try {
             if (token) {
                 const { error: rpcError } = await this.client.rpc('rca_admin_insert', {
                     p_table: 'booking_types',
-                    p_payload: { name },
+                    p_payload: payload,
                     p_admin_token: token
                 });
                 if (!rpcError) return true;
             }
 
-            const { error } = await this.client.from('booking_types').insert([{ name, is_active: true }]);
+            const { error } = await this.client.from('booking_types').insert([{ ...payload, is_active: true }]);
             if (error) throw error;
             return true;
         } catch (e) {
             console.error("[RCA Supabase] insertBookingType error:", e);
+            return false;
+        }
+    }
+
+    async updateBookingTypePrice(name, price = 0, label = '', adminToken = null) {
+        if (!this.isConfigured()) return null;
+        const token = this.getAdminToken(adminToken);
+        const payload = {
+            price: parseInt(price) || 0,
+            label: label || ''
+        };
+        try {
+            if (token) {
+                const { error: rpcError } = await this.client.rpc('rca_admin_update', {
+                    p_table: 'booking_types',
+                    p_id: name,
+                    p_payload: payload,
+                    p_admin_token: token
+                });
+                if (!rpcError) return true;
+            }
+
+            const { error } = await this.client.from('booking_types').update(payload).eq('name', name);
+            if (error) throw error;
+            return true;
+        } catch (e) {
+            console.error("[RCA Supabase] updateBookingTypePrice error:", e);
             return false;
         }
     }
@@ -698,6 +859,8 @@ class RcaSupabaseManager {
                 adminNotifyEmail: data.admin_notify_email,
                 instagramUrl: data.instagram_url,
                 address: data.address,
+                admissionFee: parseInt(data.admission_fee) || 1499,
+                slotUtrRequired: Boolean(data.slot_utr_required),
                 googleSheetWebhookUrl: data.google_sheet_webhook_url,
                 extraData: data.extra_data || {}
             };
@@ -719,6 +882,8 @@ class RcaSupabaseManager {
             admin_notify_email: s.adminNotifyEmail,
             instagram_url: s.instagramUrl,
             address: s.address,
+            admission_fee: parseInt(s.admissionFee) || 1499,
+            slot_utr_required: Boolean(s.slotUtrRequired),
             google_sheet_webhook_url: s.googleSheetWebhookUrl,
             updated_at: new Date().toISOString()
         };
@@ -739,6 +904,225 @@ class RcaSupabaseManager {
             return true;
         } catch (e) {
             console.error("[RCA Supabase] updateSettings error:", e);
+            return false;
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // 8. COMMITTEE MEMBERS (President, Owner, CEO, Coaches)
+    // -------------------------------------------------------------------------
+    async fetchCommittee() {
+        if (!this.isConfigured()) return null;
+        try {
+            const { data, error } = await this.client.from('committee_members').select('*').order('display_order', { ascending: true });
+            if (error) throw error;
+            return data.map(m => ({
+                id: m.id,
+                name: m.name,
+                designation: m.designation,
+                photo: m.photo,
+                bio: m.bio,
+                order: m.display_order
+            }));
+        } catch (e) {
+            console.warn("[RCA Supabase] fetchCommittee fallback (table may not exist yet):", e);
+            return null;
+        }
+    }
+
+    async insertCommitteeMember(item, adminToken = null) {
+        if (!this.isConfigured()) return null;
+        const token = this.getAdminToken(adminToken);
+        const payload = {
+            id: item.id,
+            name: item.name,
+            designation: item.designation,
+            photo: item.photo || '',
+            bio: item.bio || '',
+            display_order: parseInt(item.order) || 0,
+            updated_at: new Date().toISOString()
+        };
+
+        try {
+            if (token) {
+                const { error: rpcError } = await this.client.rpc('rca_admin_insert', {
+                    p_table: 'committee_members',
+                    p_payload: payload,
+                    p_admin_token: token
+                });
+                if (!rpcError) return true;
+            }
+
+            const { error } = await this.client.from('committee_members').upsert([payload]);
+            if (error) throw error;
+            return true;
+        } catch (e) {
+            console.warn("[RCA Supabase] insertCommitteeMember warning:", e);
+            return null;
+        }
+    }
+
+    async updateCommitteeMember(id, item, adminToken = null) {
+        if (!this.isConfigured()) return null;
+        const token = this.getAdminToken(adminToken);
+        const payload = {
+            name: item.name,
+            designation: item.designation,
+            photo: item.photo || '',
+            bio: item.bio || '',
+            display_order: parseInt(item.order) || 0,
+            updated_at: new Date().toISOString()
+        };
+
+        try {
+            if (token) {
+                const { error: rpcError } = await this.client.rpc('rca_admin_update', {
+                    p_table: 'committee_members',
+                    p_id: id,
+                    p_payload: payload,
+                    p_admin_token: token
+                });
+                if (!rpcError) return true;
+            }
+
+            const { error } = await this.client.from('committee_members').update(payload).eq('id', id);
+            if (error) throw error;
+            return true;
+        } catch (e) {
+            console.warn("[RCA Supabase] updateCommitteeMember warning:", e);
+            return null;
+        }
+    }
+
+    async deleteCommitteeMember(id, adminToken = null) {
+        if (!this.isConfigured()) return null;
+        const token = this.getAdminToken(adminToken);
+        try {
+            if (token) {
+                const { error: rpcError } = await this.client.rpc('rca_admin_delete', {
+                    p_table: 'committee_members',
+                    p_id: id,
+                    p_admin_token: token
+                });
+                if (!rpcError) return true;
+            }
+
+            const { error } = await this.client.from('committee_members').delete().eq('id', id);
+            if (error) throw error;
+            return true;
+        } catch (e) {
+            console.warn("[RCA Supabase] deleteCommitteeMember warning:", e);
+            return false;
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // 9. SPONSORSHIPS & PARTNERS
+    // -------------------------------------------------------------------------
+    async fetchSponsors() {
+        if (!this.isConfigured()) return null;
+        try {
+            const { data, error } = await this.client.from('sponsors').select('*').order('display_order', { ascending: true });
+            if (error) throw error;
+            return data.map(s => ({
+                id: s.id,
+                name: s.name,
+                designation: s.designation,
+                city: s.city,
+                shortInfo: s.short_info,
+                logo: s.logo,
+                order: s.display_order
+            }));
+        } catch (e) {
+            console.warn("[RCA Supabase] fetchSponsors fallback (table may not exist yet):", e);
+            return null;
+        }
+    }
+
+    async insertSponsor(item, adminToken = null) {
+        if (!this.isConfigured()) return null;
+        const token = this.getAdminToken(adminToken);
+        const payload = {
+            id: item.id,
+            name: item.name,
+            designation: item.designation,
+            city: item.city || '',
+            short_info: item.shortInfo || '',
+            logo: item.logo || '',
+            display_order: parseInt(item.order) || 0,
+            updated_at: new Date().toISOString()
+        };
+
+        try {
+            if (token) {
+                const { error: rpcError } = await this.client.rpc('rca_admin_insert', {
+                    p_table: 'sponsors',
+                    p_payload: payload,
+                    p_admin_token: token
+                });
+                if (!rpcError) return true;
+            }
+
+            const { error } = await this.client.from('sponsors').upsert([payload]);
+            if (error) throw error;
+            return true;
+        } catch (e) {
+            console.warn("[RCA Supabase] insertSponsor warning:", e);
+            return null;
+        }
+    }
+
+    async updateSponsor(id, item, adminToken = null) {
+        if (!this.isConfigured()) return null;
+        const token = this.getAdminToken(adminToken);
+        const payload = {
+            name: item.name,
+            designation: item.designation,
+            city: item.city || '',
+            short_info: item.shortInfo || '',
+            logo: item.logo || '',
+            display_order: parseInt(item.order) || 0,
+            updated_at: new Date().toISOString()
+        };
+
+        try {
+            if (token) {
+                const { error: rpcError } = await this.client.rpc('rca_admin_update', {
+                    p_table: 'sponsors',
+                    p_id: id,
+                    p_payload: payload,
+                    p_admin_token: token
+                });
+                if (!rpcError) return true;
+            }
+
+            const { error } = await this.client.from('sponsors').update(payload).eq('id', id);
+            if (error) throw error;
+            return true;
+        } catch (e) {
+            console.warn("[RCA Supabase] updateSponsor warning:", e);
+            return null;
+        }
+    }
+
+    async deleteSponsor(id, adminToken = null) {
+        if (!this.isConfigured()) return null;
+        const token = this.getAdminToken(adminToken);
+        try {
+            if (token) {
+                const { error: rpcError } = await this.client.rpc('rca_admin_delete', {
+                    p_table: 'sponsors',
+                    p_id: id,
+                    p_admin_token: token
+                });
+                if (!rpcError) return true;
+            }
+
+            const { error } = await this.client.from('sponsors').delete().eq('id', id);
+            if (error) throw error;
+            return true;
+        } catch (e) {
+            console.warn("[RCA Supabase] deleteSponsor warning:", e);
             return false;
         }
     }

@@ -2168,3 +2168,762 @@ textarea.form-control {
         grid-template-columns: 1fr;
     }
 }
+
+
+/* ==========================================================================
+   ACADEMY ADMISSIONS POPUP MODAL (GPL STYLE) & REGISTRATION UPGRADES
+   ========================================================================== */
+
+/* Admission Entrance Modal (Split-Screen Design matching Image 1) */
+.gpl-entrance-modal-box {
+    max-width: 860px !important;
+    padding: 0 !important;
+    border-radius: 24px !important;
+    overflow: hidden !important;
+    border: 2px solid var(--gold) !important;
+    background: #090e15 !important;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), 0 0 35px rgba(212, 175, 55, 0.25) !important;
+}
+
+.gpl-modal-grid {
+    display: grid;
+    grid-template-columns: 0.95fr 1.05fr;
+    min-height: 480px;
+}
+
+.gpl-modal-left {
+    background: linear-gradient(145deg, #072a24 0%, #0d3830 50%, #061e1a 100%);
+    padding: 40px 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.gpl-modal-left::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(74, 222, 128, 0.2) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.gpl-left-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    color: #032014;
+    font-weight: 900;
+    font-size: 1.15rem;
+    font-family: 'Cinzel', serif;
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.35);
+    letter-spacing: 1px;
+}
+
+.gpl-left-content {
+    position: relative;
+    z-index: 2;
+    margin-top: auto;
+}
+
+.gpl-left-pill {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #4ade80;
+    margin-bottom: 12px;
+    display: inline-block;
+}
+
+.gpl-left-title {
+    font-family: 'Cinzel', serif;
+    font-size: 2.15rem;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.18;
+    margin-bottom: 14px;
+}
+
+.gpl-left-desc {
+    color: #a7f3d0;
+    font-size: 0.94rem;
+    line-height: 1.5;
+    opacity: 0.9;
+}
+
+.gpl-modal-right {
+    background: #090e15;
+    padding: 38px 34px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+}
+
+.gpl-right-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+    color: #062b1b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 14px;
+    box-shadow: 0 6px 18px rgba(34, 197, 94, 0.3);
+}
+
+.gpl-right-subtitle {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.gpl-right-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.15;
+    margin-bottom: 12px;
+}
+
+.gpl-right-title span {
+    color: #facc15;
+}
+
+.gpl-right-desc {
+    font-size: 0.92rem;
+    color: #cbd5e1;
+    line-height: 1.55;
+    margin-bottom: 20px;
+}
+
+.gpl-checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 26px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.gpl-check-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.93rem;
+    color: #e2e8f0;
+    font-weight: 500;
+}
+
+.gpl-check-badge {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(34, 197, 94, 0.18);
+    border: 1px solid #22c55e;
+    color: #4ade80;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+}
+
+.gpl-btn-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.gpl-btn-register {
+    flex: 1.3;
+    background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+    color: #032014 !important;
+    font-weight: 800;
+    font-size: 1rem;
+    padding: 14px 22px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: var(--transition);
+    box-shadow: 0 8px 24px rgba(34, 197, 94, 0.35);
+    text-decoration: none;
+}
+
+.gpl-btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(34, 197, 94, 0.5);
+}
+
+.gpl-btn-later {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.06);
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-align: center;
+    transition: var(--transition);
+}
+
+.gpl-btn-later:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+}
+
+/* Category Selection Cards (Under-14, Under-16, Under-19) */
+.category-selector-group {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 10px 0 18px;
+}
+
+.category-card {
+    background: rgba(36, 8, 60, 0.7);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    user-select: none;
+}
+
+.category-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    background: rgba(55, 16, 90, 0.85);
+}
+
+.category-card.active {
+    border-color: #22c55e !important;
+    background: linear-gradient(145deg, rgba(34, 197, 94, 0.18) 0%, rgba(36, 8, 60, 0.9) 100%) !important;
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.25);
+}
+
+.category-card.active::after {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    font-size: 0.72rem;
+    color: #22c55e;
+}
+
+.category-tag {
+    font-family: 'Cinzel', serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #ffffff;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.category-card.active .category-tag {
+    color: #4ade80;
+}
+
+.category-sub {
+    font-size: 0.74rem;
+    color: #baa3d6;
+    display: block;
+}
+
+/* Live Age Calculation Display & Validation Box */
+.age-calc-box {
+    background: rgba(22, 4, 36, 0.85);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.86rem;
+}
+
+.age-calc-result {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.age-calc-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.age-badge-valid {
+    background: rgba(34, 197, 94, 0.2);
+    border: 1px solid #22c55e;
+    color: #4ade80;
+}
+
+.age-badge-warning {
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid #f59e0b;
+    color: #fbbf24;
+}
+
+.age-alert-msg {
+    margin-top: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    display: none;
+}
+
+.age-alert-msg.show {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.age-alert-warning {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid #ef4444;
+    color: #fca5a5;
+}
+
+.age-switch-btn {
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* Fixed Payment QR Box & UPI Card */
+.payment-qr-card {
+    background: linear-gradient(145deg, #180327 0%, #280743 100%);
+    border: 2px solid var(--gold);
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.payment-qr-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px dashed rgba(212, 175, 55, 0.35);
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+}
+
+.payment-fee-badge {
+    background: var(--gold-gradient);
+    color: #000;
+    font-weight: 900;
+    font-size: 1.15rem;
+    padding: 6px 14px;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.payment-locked-pill {
+    background: rgba(34, 197, 94, 0.2);
+    border: 1px solid #22c55e;
+    color: #4ade80;
+    font-size: 0.74rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+}
+
+.payment-qr-body {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.payment-qr-img-wrap {
+    width: 170px;
+    height: 170px;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    flex-shrink: 0;
+    margin: 0 auto;
+    position: relative;
+    border: 3px solid var(--gold);
+}
+
+.payment-qr-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 6px;
+    display: block;
+}
+
+.payment-details-col {
+    flex: 1;
+    min-width: 240px;
+}
+
+.upi-id-box {
+    background: rgba(12, 2, 20, 0.85);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.upi-id-text {
+    font-family: monospace;
+    font-size: 0.98rem;
+    color: #facc15;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.btn-copy-upi {
+    background: rgba(212, 175, 55, 0.2);
+    color: var(--gold-light);
+    border: 1px solid var(--gold);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-copy-upi:hover {
+    background: var(--gold);
+    color: #000;
+}
+
+.btn-pay-upi-app {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    background: linear-gradient(135deg, #5f259f 0%, #7d33d4 100%);
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 0.92rem;
+    padding: 11px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 12px;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(95, 37, 159, 0.4);
+}
+
+/* Side QR Card for Tournament Section */
+.tournament-qr-sidecard {
+    background: linear-gradient(145deg, #1b042d 0%, #2c0949 100%);
+    border: 2px solid var(--gold);
+    border-radius: 18px;
+    padding: 24px 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .gpl-modal-grid {
+        grid-template-columns: 1fr;
+    }
+    .gpl-modal-left {
+        padding: 28px 22px;
+        min-height: 200px;
+    }
+    .gpl-modal-right {
+        padding: 28px 20px;
+    }
+    .gpl-left-title {
+        font-size: 1.6rem;
+    }
+    .gpl-right-title {
+        font-size: 1.65rem;
+    }
+    .gpl-btn-group {
+        flex-direction: column;
+    }
+    .category-selector-group {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    .payment-qr-body {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* ==========================================================================
+   ABOUT RCA: SUB-ELEMENTS TABS, COMMITTEE & SPONSORSHIPS
+   ========================================================================== */
+.about-tabs-nav {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.about-tab-btn {
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    padding: 12px 24px;
+    border-radius: 30px;
+    background: rgba(36, 8, 60, 0.75);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    color: var(--gold-300);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.about-tab-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold-100);
+    background: rgba(212, 175, 55, 0.15);
+    transform: translateY(-2px);
+}
+
+.about-tab-btn.active {
+    background: var(--gold-gradient);
+    color: var(--bg-darker);
+    border-color: var(--gold);
+    box-shadow: 0 4px 18px rgba(212, 175, 55, 0.4);
+    font-weight: 800;
+}
+
+.about-tab-content {
+    display: none;
+    animation: aboutFadeIn 0.35s ease forwards;
+}
+
+.about-tab-content.active {
+    display: block;
+}
+
+@keyframes aboutFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Committee Cards */
+.committee-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 26px;
+}
+
+.committee-card {
+    background: linear-gradient(145deg, rgba(36, 8, 60, 0.85), rgba(20, 4, 34, 0.95));
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: var(--radius-lg);
+    padding: 26px 20px;
+    text-align: center;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.committee-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--gold);
+    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
+}
+
+.committee-photo-wrap {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    overflow: hidden;
+    background: rgba(212, 175, 55, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    flex-shrink: 0;
+}
+
+.committee-photo-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.committee-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+}
+
+.committee-role {
+    display: inline-block;
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    color: var(--gold);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.committee-bio {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+/* Sponsors & Partners Cards */
+.sponsors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 26px;
+}
+
+.sponsor-card {
+    background: linear-gradient(145deg, rgba(36, 8, 60, 0.85), rgba(20, 4, 34, 0.95));
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.sponsor-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--gold);
+    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
+}
+
+.sponsor-logo-box {
+    height: 110px;
+    border-radius: var(--radius-md);
+    background: rgba(10, 2, 18, 0.6);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    overflow: hidden;
+    padding: 10px;
+}
+
+.sponsor-logo-box img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.sponsor-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1.25rem;
+    color: #fff;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.sponsor-badge-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.sponsor-role-pill {
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    color: var(--gold);
+    padding: 3px 10px;
+    border-radius: 14px;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.sponsor-city-pill {
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.35);
+    color: #93c5fd;
+    padding: 3px 10px;
+    border-radius: 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.sponsor-info-text {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.sponsor-partner-cta-card {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(36, 8, 60, 0.7));
+    border: 2px dashed rgba(212, 175, 55, 0.4);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    text-align: center;
+    margin-top: 35px;
+}

@@ -1628,28 +1628,28 @@
             <button class="modal-close" onclick="closeModal('slotBookingModal')">&times;</button>
             
             <div style="text-align: center; margin-bottom: 24px;">
-                <span class="section-pill" style="font-size: 0.75rem; padding: 4px 14px; margin-bottom: 8px;">ONLINE RESERVATION</span>
-                <h3 style="font-size: 1.65rem; color: #fff; margin-top: 6px;">
+                <span class="section-pill" id="popupModalPill" style="font-size: 0.75rem; padding: 4px 14px; margin-bottom: 8px;">ONLINE RESERVATION</span>
+                <h3 id="popupModalTitle" style="font-size: 1.65rem; color: #fff; margin-top: 6px;">
                     Book Slot / <span class="gold-text">Registration</span>
                 </h3>
-                <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">
+                <p id="popupModalDesc" style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">
                     Fill out the form below. Confirmation alert is sent immediately to Coach R.K. Chauhan.
                 </p>
             </div>
 
             <form class="booking-form" id="popupBookingForm" onsubmit="handlePopupBookingSubmit(event)">
-                <div class="form-group form-full">
-                    <label for="popupPlayerName"><i class="fa-solid fa-user"></i> Player Full Name *</label>
+                <div class="form-group form-full" id="popupPlayerNameGroup">
+                    <label for="popupPlayerName" id="popupPlayerNameLabel"><i class="fa-solid fa-user"></i> Player Full Name *</label>
                     <input type="text" id="popupPlayerName" class="form-control" placeholder="e.g. Vikramaditya Singh" required>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="popupPlayerPhoneGroup">
                     <label for="popupPlayerPhone"><i class="fa-solid fa-phone"></i> Mobile / WhatsApp *</label>
                     <input type="tel" id="popupPlayerPhone" class="form-control" placeholder="10-digit Mobile No." pattern="[0-9]{10}" maxlength="10" inputmode="numeric" required>
                     <div id="popupPlayerPhoneError" class="phone-error-hint" style="font-size: 0.8rem; margin-top: 4px; display: none;"></div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="popupTotalPersonsGroup">
                     <label for="popupTotalPersons"><i class="fa-solid fa-users"></i> Total Persons / Players *</label>
                     <select id="popupTotalPersons" class="form-control" required onchange="handlePopupTotalPersonsChange(this.value)">
                         <option value="1 Player (Individual Practice)">1 Player (Individual Practice)</option>
@@ -1661,12 +1661,12 @@
                     </select>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="popupPlayerAgeGroup">
                     <label for="popupPlayerAge"><i class="fa-solid fa-id-card"></i> Player Age</label>
                     <input type="number" id="popupPlayerAge" class="form-control" placeholder="e.g. 18" min="6" max="65">
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="popupBookingTypeGroup">
                     <label for="popupBookingType"><i class="fa-solid fa-trophy"></i> Inquiry / Booking Type *</label>
                     <select id="popupBookingType" class="form-control" required onchange="handleBookingTypeSelectionChange(this.value, 'popup')">
                         <!-- Populated dynamically from rcaDB.getBookingTypes() -->
@@ -1674,22 +1674,22 @@
                     <div id="popupBookingTypePriceBox"></div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="popupSlotDateGroup">
                     <label for="popupSlotDate"><i class="fa-solid fa-calendar-days"></i> Preferred Date *</label>
                     <input type="date" id="popupSlotDate" class="form-control" required>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="popupCustomTimeGroup">
                     <label for="popupCustomTime"><i class="fa-solid fa-clock"></i> Preferred Time (Custom) *</label>
                     <input type="text" id="popupCustomTime" class="form-control" placeholder="e.g. 06:30 AM to 08:30 AM" value="06:30 AM - 08:30 AM" required>
                 </div>
 
-                <div class="form-group form-full">
+                <div class="form-group form-full" id="popupPlayerCityGroup">
                     <label for="popupPlayerCity"><i class="fa-solid fa-location-dot"></i> City / Location *</label>
                     <input type="text" id="popupPlayerCity" class="form-control" value="Vrindavan" required>
                 </div>
 
-                <div class="form-group form-full">
+                <div class="form-group form-full" id="popupPlayerRemarksGroup">
                     <label for="popupPlayerRemarks"><i class="fa-solid fa-message"></i> Special Requirements / Notes</label>
                     <textarea id="popupPlayerRemarks" class="form-control" placeholder="Batting/bowling preferences, gear requirements, or club details..."></textarea>
                 </div>
@@ -1740,7 +1740,7 @@
                 </div>
 
                 <div class="form-group form-full" style="margin-top: 10px;">
-                    <button type="submit" class="btn btn-gold" style="width: 100%; font-size: 1.08rem; padding: 16px;">
+                    <button type="submit" id="popupSubmitBtn" class="btn btn-gold" style="width: 100%; font-size: 1.08rem; padding: 16px;">
                         <i class="fa-solid fa-check"></i> Confirm Booking
                     </button>
                 </div>

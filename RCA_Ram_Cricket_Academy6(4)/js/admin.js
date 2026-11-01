@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderAdminCommittee();
             renderAdminSponsors();
             renderAdminAboutProfile();
+            loadSettingsIntoForm();
             loadSupabaseSettings();
         }
     });
@@ -639,11 +640,23 @@ function renderNewJoinyTable() {
                     </span>
                 </td>
                 <td>
-                    <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">${escapeHtml(b.name)}</div>
-                    <div style="font-size: 0.8rem; color: #baa3d6; margin-top: 2px;">
-                        <i class="fa-solid fa-user-clock"></i> Age: <strong style="color: #fde68a;">${b.age || '-'}</strong>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        ${(b.photo || (b.formData && b.formData.playerPhoto)) ? `
+                            <img src="${b.photo || b.formData.playerPhoto}" alt="Photo" style="width: 38px; height: 46px; object-fit: cover; border-radius: 4px; border: 1.5px solid var(--admin-gold); flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.5);">
+                        ` : `
+                            <div style="width: 38px; height: 46px; background: rgba(212,175,55,0.1); border: 1px dashed rgba(212,175,55,0.4); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--admin-gold); flex-shrink: 0;">
+                                <i class="fa-solid fa-user" style="font-size: 0.85rem;"></i>
+                            </div>
+                        `}
+                        <div>
+                            <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">${escapeHtml(b.name)}</div>
+                            <div style="font-size: 0.8rem; color: #baa3d6; margin-top: 2px;">
+                                <i class="fa-solid fa-user-clock"></i> Age: <strong style="color: #fde68a;">${b.age || '-'}</strong>
+                            </div>
+                            ${b.dob ? `<div style="font-size: 0.75rem; color: #a7f3d0; margin-top: 2px;"><i class="fa-solid fa-cake-candles"></i> DOB: ${b.dob}</div>` : ''}
+                            ${(b.aadhaarNumber || (b.formData && b.formData.aadhaarNumber)) ? `<div style="font-size: 0.72rem; color: var(--admin-gold-light); margin-top: 2px;"><i class="fa-solid fa-id-card"></i> Aadhaar: ${escapeHtml((b.aadhaarNumber || b.formData.aadhaarNumber).replace(/(\d{4})(\d{4})(\d{4})/, '$1 $2 $3'))}</div>` : ''}
+                        </div>
                     </div>
-                    ${b.dob ? `<div style="font-size: 0.75rem; color: #a7f3d0; margin-top: 2px;"><i class="fa-solid fa-cake-candles"></i> DOB: ${b.dob}</div>` : ''}
                 </td>
                 <td>
                     <div style="font-weight: 600; color: #e2e8f0; font-size: 0.85rem;">
@@ -809,9 +822,17 @@ function renderTournamentRegsTable() {
             <tr>
                 <td><strong class="gold-id" style="color: var(--admin-gold); font-weight: 700;">${escapeHtml(b.id)}</strong></td>
                 <td>
-                    <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">${escapeHtml(b.name)}</div>
-                    <div style="font-size: 0.8rem; color: var(--admin-text-dim);">Father: ${escapeHtml(b.fatherName || '-')}</div>
-                    <div style="font-size: 0.78rem; color: var(--admin-gold-light);">Age: ${escapeHtml(String(b.age || '-'))} | DOB: ${escapeHtml(b.dob || '-')}</div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        ${(b.photo || (b.formData && b.formData.playerPhoto)) ? `
+                            <img src="${b.photo || b.formData.playerPhoto}" alt="Photo" style="width: 38px; height: 46px; object-fit: cover; border-radius: 4px; border: 1.5px solid var(--admin-gold); flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.5);">
+                        ` : ''}
+                        <div>
+                            <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">${escapeHtml(b.name)}</div>
+                            <div style="font-size: 0.8rem; color: var(--admin-text-dim);">Father: ${escapeHtml(b.fatherName || '-')}</div>
+                            <div style="font-size: 0.78rem; color: var(--admin-gold-light);">Age: ${escapeHtml(String(b.age || '-'))} | DOB: ${escapeHtml(b.dob || '-')}</div>
+                            ${(b.aadhaarNumber || (b.formData && b.formData.aadhaarNumber)) ? `<div style="font-size: 0.72rem; color: var(--admin-gold-light); margin-top: 2px;"><i class="fa-solid fa-id-card"></i> Aadhaar: ${escapeHtml((b.aadhaarNumber || b.formData.aadhaarNumber).replace(/(\d{4})(\d{4})(\d{4})/, '$1 $2 $3'))}</div>` : ''}
+                        </div>
+                    </div>
                 </td>
                 <td>
                     <span class="status-pill status-Confirmed" style="font-size: 0.8rem; background: rgba(234, 179, 8, 0.15); color: #fbbf24; border: 1px solid rgba(234, 179, 8, 0.4);">
@@ -1068,15 +1089,21 @@ function viewPlayerSlip(bookingId) {
     const b = bookings.find(item => item.id === bookingId);
     if (!b) return;
 
+    const playerPhoto = b.photo || (b.formData && b.formData.playerPhoto) || '';
+    const aadhaarNo = b.aadhaarNumber || (b.formData && b.formData.aadhaarNumber) || '';
+
     const modalContent = document.getElementById('slipModalContent');
     modalContent.innerHTML = `
         <div class="success-pass" style="margin: 0;">
-            <div class="success-pass-header">
+            <div class="success-pass-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
                     <div style="font-size: 0.72rem; color: var(--admin-gold-light); font-weight: 700;">RAM CRICKET ACADEMY • OFFICIAL REGISTRATION</div>
                     <div class="pass-id">${b.id}</div>
                 </div>
-                <img src="assets/images/logo.png" alt="RCA" style="width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--admin-gold);">
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    ${playerPhoto ? `<img src="${playerPhoto}" alt="Player Photo" style="width: 50px; height: 60px; object-fit: cover; border-radius: 6px; border: 1.5px solid var(--admin-gold);">` : ''}
+                    <img src="assets/images/logo.png" alt="RCA" style="width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--admin-gold);">
+                </div>
             </div>
 
             <div class="pass-grid">
@@ -1092,6 +1119,14 @@ function viewPlayerSlip(bookingId) {
                     <span class="pass-label">Age & Guardian:</span>
                     <div class="pass-value">${b.age} yrs ${b.fatherName && b.fatherName !== '-' ? '• S/o ' + escapeHtml(b.fatherName) : ''}</div>
                 </div>
+                ${aadhaarNo ? `
+                <div>
+                    <span class="pass-label">Aadhaar Card No:</span>
+                    <div class="pass-value" style="color: var(--admin-gold-light); font-weight: 700; letter-spacing: 1px;">
+                        ${escapeHtml(aadhaarNo.replace(/(\d{4})(\d{4})(\d{4})/, '$1 $2 $3'))}
+                    </div>
+                </div>
+                ` : ''}
                 <div>
                     <span class="pass-label">Phone (WhatsApp):</span>
                     <div class="pass-value">${b.phone}</div>
@@ -1130,7 +1165,7 @@ function viewPlayerSlip(bookingId) {
                         <i class="fa-solid fa-file-invoice"></i> Additional / Custom Form Details:
                     </div>
                     <div class="pass-grid">
-                        ${Object.entries(b.formData).map(([k, v]) => `
+                        ${Object.entries(b.formData).filter(([k]) => k !== 'playerPhoto' && k !== 'photo').map(([k, v]) => `
                             <div>
                                 <span class="pass-label">${escapeHtml(k.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()))}:</span>
                                 <div class="pass-value" style="color: #a7f3d0;">${escapeHtml(String(v))}</div>
@@ -1147,6 +1182,10 @@ function viewPlayerSlip(bookingId) {
     `;
 
     showModal('viewSlipModal');
+}
+
+function viewRegistrationDetails(bookingId) {
+    viewPlayerSlip(bookingId);
 }
 
 function handleManualBooking(event) {
@@ -1914,23 +1953,28 @@ function deleteNoticeItem(id) {
 // VIEW 6: SETTINGS & GOOGLE SHEETS SYNC
 // -----------------------------------------------------------------------------
 function loadSettingsIntoForm() {
-    const isSlotUtrReq = window.rcaDB.isSlotUtrRequired();
+    const isSlotUtrReq = window.rcaDB && window.rcaDB.isSlotUtrRequired ? window.rcaDB.isSlotUtrRequired() : false;
     const radMandatory = document.getElementById('slotUtrMandatoryRadio');
     const radOptional = document.getElementById('slotUtrOptionalRadio');
     if (radMandatory && radOptional) {
-        if (isSlotUtrReq) radMandatory.checked = true;
-        else radOptional.checked = true;
+        if (isSlotUtrReq) {
+            radMandatory.checked = true;
+            radOptional.checked = false;
+        } else {
+            radOptional.checked = true;
+            radMandatory.checked = false;
+        }
     }
-    const s = window.rcaDB.getSettings();
-    document.getElementById('setPhone').value = s.phone;
+    const s = window.rcaDB ? window.rcaDB.getSettings() : {};
+    document.getElementById('setPhone').value = s.phone || '';
     if (document.getElementById('setAltPhone')) {
         document.getElementById('setAltPhone').value = s.phoneAlternate || '8265800805';
     }
-    document.getElementById('setCoach').value = s.headCoach;
-    document.getElementById('setEmail').value = s.email;
-    document.getElementById('setAdminEmail').value = s.adminNotifyEmail;
-    document.getElementById('setInstagram').value = s.instagramUrl;
-    document.getElementById('setAddress').value = s.address;
+    document.getElementById('setCoach').value = s.headCoach || '';
+    document.getElementById('setEmail').value = s.email || '';
+    document.getElementById('setAdminEmail').value = s.adminNotifyEmail || '';
+    document.getElementById('setInstagram').value = s.instagramUrl || '';
+    document.getElementById('setAddress').value = s.address || '';
     if (document.getElementById('setAdmissionFee')) {
         document.getElementById('setAdmissionFee').value = window.rcaDB.getAdmissionFee ? window.rcaDB.getAdmissionFee() : 1499;
     }
@@ -1943,6 +1987,8 @@ function loadSettingsIntoForm() {
 
 function handleSettingsUpdate(event) {
     event.preventDefault();
+    const radMandatory = document.getElementById('slotUtrMandatoryRadio');
+    const isSlotUtrReq = radMandatory ? radMandatory.checked : (window.rcaDB ? window.rcaDB.isSlotUtrRequired() : false);
     const newSettings = {
         phone: document.getElementById('setPhone').value.trim(),
         phoneAlternate: document.getElementById('setAltPhone') ? document.getElementById('setAltPhone').value.trim() : '8265800805',
@@ -1951,7 +1997,8 @@ function handleSettingsUpdate(event) {
         adminNotifyEmail: document.getElementById('setAdminEmail').value.trim(),
         instagramUrl: document.getElementById('setInstagram').value.trim(),
         address: document.getElementById('setAddress').value.trim(),
-        admissionFee: document.getElementById('setAdmissionFee') ? parseInt(document.getElementById('setAdmissionFee').value) || 1499 : 1499
+        admissionFee: document.getElementById('setAdmissionFee') ? parseInt(document.getElementById('setAdmissionFee').value) || 1499 : 1499,
+        slotUtrRequired: isSlotUtrReq
     };
 
     if (window.rcaDB.updateAdmissionFee && document.getElementById('setAdmissionFee')) {

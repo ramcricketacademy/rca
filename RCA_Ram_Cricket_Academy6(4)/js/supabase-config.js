@@ -168,6 +168,8 @@ class RcaSupabaseManager {
                     remarks: b.remarks,
                     category: inferredCategory,
                     dob: b.dob || (b.form_data && b.form_data.dob) || '',
+                    aadhaarNumber: b.aadhaar_number || (b.form_data && b.form_data.aadhaarNumber) || '',
+                    photo: (b.form_data && b.form_data.playerPhoto) || b.photo || '',
                     utrNumber: b.utr_number || (b.form_data && b.form_data.utrNumber) || '',
                     feeAmount: b.fee_amount || (b.form_data && b.form_data.feeAmount) || (isExplicitSlot ? '' : '1499'),
                     paymentStatus: b.payment_status || (b.form_data && b.form_data.paymentStatus) || (b.utr_number ? 'Pending Verification' : 'New'),
@@ -850,6 +852,11 @@ class RcaSupabaseManager {
         try {
             const { data, error } = await this.client.from('settings').select('*').eq('id', 'rca_settings').single();
             if (error) throw error;
+            const extra = data.extra_data || {};
+            const isUtrReq = (data.slot_utr_required !== undefined && data.slot_utr_required !== null)
+                ? Boolean(data.slot_utr_required)
+                : Boolean(extra.slotUtrRequired !== undefined ? extra.slotUtrRequired : extra.slot_utr_required);
+
             return {
                 academyName: data.academy_name,
                 headCoach: data.head_coach,
@@ -860,7 +867,7 @@ class RcaSupabaseManager {
                 instagramUrl: data.instagram_url,
                 address: data.address,
                 admissionFee: parseInt(data.admission_fee) || 1499,
-                slotUtrRequired: Boolean(data.slot_utr_required),
+                slotUtrRequired: isUtrReq,
                 googleSheetWebhookUrl: data.google_sheet_webhook_url,
                 extraData: data.extra_data || {}
             };
@@ -873,19 +880,33 @@ class RcaSupabaseManager {
     async updateSettings(s, adminToken = null) {
         if (!this.isConfigured()) return null;
         const token = this.getAdminToken(adminToken);
-        const payload = {
-            academy_name: s.academyName,
-            head_coach: s.headCoach,
-            phone: s.phone,
-            phone_alternate: s.phoneAlternate,
-            email: s.email,
-            admin_notify_email: s.adminNotifyEmail,
-            instagram_url: s.instagramUrl,
-            address: s.address,
-            admission_fee: parseInt(s.admissionFee) || 1499,
-            slot_utr_required: Boolean(s.slotUtrRequired),
-            google_sheet_webhook_url: s.googleSheetWebhookUrl,
+        const isUtrReq = (s.slotUtrRequired !== undefined)
+            ? Boolean(s.slotUtrRequired)
+            : ((s.slot_utr_required !== undefined) ? Boolean(s.slot_utr_required) : false);
+
+        const basePayload = {
+            academy_name: s.academyName || s.academy_name || 'RCA (RAM CRICKET ACADEMY)',
+            head_coach: s.headCoach || s.head_coach || 'Coach R.K. Chauhan',
+            phone: s.phone || '9897517704',
+            phone_alternate: s.phoneAlternate || s.phone_alternate || '8265800805',
+            email: s.email || 'RCAACADEMY9897@gmail.com',
+            admin_notify_email: s.adminNotifyEmail || s.admin_notify_email || 'RCAACADEMY9897@gmail.com',
+            instagram_url: s.instagramUrl || s.instagram_url || '',
+            address: s.address || '',
+            google_sheet_webhook_url: s.googleSheetWebhookUrl || s.google_sheet_webhook_url || '',
+            extra_data: {
+                ...(s.extraData || {}),
+                slotUtrRequired: isUtrReq,
+                slot_utr_required: isUtrReq,
+                admissionFee: parseInt(s.admissionFee || s.admission_fee) || 1499
+            },
             updated_at: new Date().toISOString()
+        };
+
+        const extendedPayload = {
+            ...basePayload,
+            admission_fee: parseInt(s.admissionFee || s.admission_fee) || 1499,
+            slot_utr_required: isUtrReq
         };
 
         try {
@@ -893,14 +914,20 @@ class RcaSupabaseManager {
                 const { error: rpcError } = await this.client.rpc('rca_admin_update', {
                     p_table: 'settings',
                     p_id: 'rca_settings',
-                    p_payload: payload,
+                    p_payload: extendedPayload,
                     p_admin_token: token
                 });
                 if (!rpcError) return true;
             }
 
-            const { error } = await this.client.from('settings').upsert({ id: 'rca_settings', ...payload });
-            if (error) throw error;
+            // Upsert extended payload (with slot_utr_required)
+            const { error: extErr } = await this.client.from('settings').upsert({ id: 'rca_settings', ...extendedPayload });
+            if (!extErr) return true;
+
+            // Fallback to basePayload (saving slotUtrRequired inside extra_data) if slot_utr_required column doesn't exist
+            console.warn("[RCA Supabase] Retrying settings update with extra_data fallback:", extErr.message);
+            const { error: baseErr } = await this.client.from('settings').upsert({ id: 'rca_settings', ...basePayload });
+            if (baseErr) throw baseErr;
             return true;
         } catch (e) {
             console.error("[RCA Supabase] updateSettings error:", e);

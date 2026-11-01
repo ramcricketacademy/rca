@@ -203,6 +203,25 @@
                     <input type="text" id="standaloneCity" class="form-control" value="Vrindavan" required>
                 </div>
 
+                <!-- AADHAAR CARD NUMBER (12-DIGIT MANDATORY) -->
+                <div class="form-group">
+                    <label for="standaloneAadhaar"><i class="fa-solid fa-id-card" style="color: var(--gold);"></i> Aadhaar Card Number (12 Digits) *</label>
+                    <input type="text" id="standaloneAadhaar" class="form-control" placeholder="12-digit Aadhaar No. (e.g. 5432XXXXXXXX)" maxlength="12" pattern="[0-9]{12}" inputmode="numeric" required>
+                </div>
+
+                <!-- PLAYER PASSPORT PHOTO UPLOAD (MANDATORY) -->
+                <div class="form-group form-full">
+                    <label for="standalonePhoto"><i class="fa-solid fa-camera" style="color: var(--gold);"></i> Upload Player Passport Photo *</label>
+                    <input type="file" id="standalonePhoto" class="form-control" accept="image/*" onchange="previewPlayerPhoto(this, 'standalonePhotoPreview')" required>
+                    <div id="standalonePhotoPreview" style="margin-top: 10px; display: none; align-items: center; gap: 12px; background: rgba(0,0,0,0.4); padding: 8px 14px; border-radius: 8px; border: 1px dashed var(--gold);">
+                        <img src="" alt="Player Photo Preview" style="width: 70px; height: 85px; object-fit: cover; border-radius: 6px; border: 1.5px solid var(--gold);">
+                        <div>
+                            <span style="font-size: 0.85rem; color: #4ade80; font-weight: 700; display: block;"><i class="fa-solid fa-circle-check"></i> Photo Selected</span>
+                            <span style="font-size: 0.75rem; color: #cbd5e1;">Will be printed on your official Trial Pass</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- FIXED ₹1,499 PAYMENT & PHONEPE QR CARD -->
                 <div class="form-group form-full">
                     <div class="payment-qr-card">

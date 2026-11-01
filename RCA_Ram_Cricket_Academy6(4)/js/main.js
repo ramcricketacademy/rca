@@ -545,6 +545,10 @@ function handleBookingTypeSelectionChange(selectedName, scope = 'both') {
                   `;
         }
         syncSlotPaymentCard(details.name, details.price, 'popup', details.tier);
+        if (matchedSlot && matchedSlot.time && !matchedSlot.time.toLowerCase().includes('flexible')) {
+            const timeEl = document.getElementById('popupCustomTime');
+            if (timeEl) timeEl.value = matchedSlot.time;
+        }
     }
 }
 
@@ -777,8 +781,14 @@ function openBookingModal(prefillType = '', prefillTime = '') {
         const slotTime = prefillTime || (matchedSlot ? matchedSlot.time : '06:30 AM - 08:30 AM');
 
         if (popupBookingType) {
-            if (matchedSlot) {
-                popupBookingType.innerHTML = `<option value="${escapeHtml(slotTitle)}" data-price="${effectivePrice}" selected>${escapeHtml(slotTitle)}</option>`;
+            if (allSlots && allSlots.length > 0) {
+                popupBookingType.innerHTML = allSlots.map(s => {
+                    const priceForSelectedTier = window.rcaDB && window.rcaDB.getSlotPriceForTier 
+                        ? window.rcaDB.getSlotPriceForTier(s, selectedTier) 
+                        : (s.price || 1500);
+                    const isSelected = (s.title && s.title.toLowerCase().trim() === slotTitle.toLowerCase().trim()) ? 'selected' : '';
+                    return `<option value="${escapeHtml(s.title)}" data-price="${priceForSelectedTier}" ${isSelected}>${escapeHtml(s.title)}</option>`;
+                }).join('');
                 popupBookingType.value = slotTitle;
             } else {
                 renderBookingTypeDropdowns();
@@ -1482,9 +1492,45 @@ function prefillBooking(programName) {
 }
 
 // -----------------------------------------------------------------------------
+// PLAYER PHOTO PREVIEW & BASE64 CONVERTER (User Requested: Mandatory Photo)
+// -----------------------------------------------------------------------------
+function previewPlayerPhoto(inputEl, previewContainerId) {
+    const container = document.getElementById(previewContainerId);
+    if (!container) return;
+    const file = inputEl.files && inputEl.files[0];
+    if (file) {
+        if (file.size > 5 * 1024 * 1024) {
+            alert("Photo file size 5MB se choti honi chahiye! Kripya choti size ki photo select karein.");
+            inputEl.value = '';
+            container.style.display = 'none';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = container.querySelector('img');
+            if (img) img.src = e.target.result;
+            container.style.display = 'flex';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        container.style.display = 'none';
+    }
+}
+
+function readFileAsBase64(file) {
+    return new Promise((resolve) => {
+        if (!file) return resolve('');
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => resolve('');
+        reader.readAsDataURL(file);
+    });
+}
+
+// -----------------------------------------------------------------------------
 // RRPL TRIAL REGISTRATION SUBMISSION (₹1,499)
 // -----------------------------------------------------------------------------
-function handleRrplTrialSubmit(event) {
+async function handleRrplTrialSubmit(event) {
     event.preventDefault();
     const form = event.target;
     const dynamic = extractDynamicFormData(form, 'rrpl_trials');
@@ -1514,6 +1560,24 @@ function handleRrplTrialSubmit(event) {
         return;
     }
 
+    // Mandatory 12-digit Aadhaar Card Number validation (User Requested)
+    const aadhaarInput = document.getElementById('rrplAadhaar');
+    const aadhaar = (aadhaarInput?.value || '').trim().replace(/\s+/g, '');
+    if (!aadhaar || !/^\d{12}$/.test(aadhaar)) {
+        alert("Aadhaar Card number theek 12 digits ka hona anivarya (mandatory) hai! Kripya 12-digit number check karein.");
+        if (aadhaarInput) { aadhaarInput.focus(); aadhaarInput.style.borderColor = "#ef4444"; }
+        return;
+    }
+
+    // Mandatory Player Photo Upload validation (User Requested)
+    const photoInput = document.getElementById('rrplPhoto');
+    if (!photoInput || !photoInput.files || !photoInput.files[0]) {
+        alert("Player passport photo upload karna anivarya (mandatory) hai! Kripya photo upload karein.");
+        if (photoInput) { photoInput.focus(); photoInput.style.borderColor = "#ef4444"; }
+        return;
+    }
+    const photoBase64 = await readFileAsBase64(photoInput.files[0]);
+
     if (!utr) {
         alert("Kripya payment QR scan karke UPI Transaction ID (UTR) bharein!");
         const utrEl = document.getElementById('rrplUtr');
@@ -1528,6 +1592,8 @@ function handleRrplTrialSubmit(event) {
         category: category,
         dob: dob,
         phone: phone,
+        aadhaarNumber: aadhaar,
+        photo: photoBase64,
         email: dynamic.email || "",
         city: city || "Vrindavan",
         role: role,
@@ -1540,11 +1606,13 @@ function handleRrplTrialSubmit(event) {
         feeAmount: "1499",
         utrNumber: utr,
         paymentStatus: "Pending Verification",
-        remarks: `Dedicated RRPL 2026 Trial. Category: ${category}. Father: ${fatherName}. Role: ${role}. UTR: ${utr}. Trial Fee: ₹1,499.`,
+        remarks: `Dedicated RRPL 2026 Trial. Category: ${category}. Father: ${fatherName}. Role: ${role}. Aadhaar: ${aadhaar}. UTR: ${utr}. Trial Fee: ₹1,499.`,
         formData: {
             category,
             dob,
             fatherName,
+            aadhaarNumber: aadhaar,
+            playerPhoto: photoBase64,
             utrNumber: utr,
             feeAmount: "1499",
             ...(dynamic.formData || {})
@@ -1559,6 +1627,12 @@ function handleRrplTrialSubmit(event) {
         document.getElementById('rrplCity').value = 'Vrindavan';
         const errEl = document.getElementById('rrplPhoneError');
         if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+        const previewEl = document.getElementById('rrplPhotoPreview');
+        if (previewEl) {
+            previewEl.style.display = 'none';
+            const img = previewEl.querySelector('img');
+            if (img) img.src = '';
+        }
     } else {
         alert("There was an issue saving your registration. Please call Coach Chauhan directly at +91 9897517704.");
     }
@@ -1767,7 +1841,7 @@ function shareRegistrationLink() {
 // -----------------------------------------------------------------------------
 // ADMISSION REGISTRATION FORM SUBMIT HANDLER (POPUP MODAL & STANDALONE PAGE)
 // -----------------------------------------------------------------------------
-function handleAdmissionRegistrationSubmit(event, scope = 'adm') {
+async function handleAdmissionRegistrationSubmit(event, scope = 'adm') {
     event.preventDefault();
     const form = event.target;
     const dynamic = extractDynamicFormData(form, 'academy_admission');
@@ -1796,6 +1870,24 @@ function handleAdmissionRegistrationSubmit(event, scope = 'adm') {
         return;
     }
 
+    // Mandatory 12-digit Aadhaar Card validation (User Requested)
+    const aadhaarInput = document.getElementById(scope === 'standalone' ? 'standaloneAadhaar' : 'admAadhaar');
+    const aadhaar = (aadhaarInput?.value || '').trim().replace(/\s+/g, '');
+    if (!aadhaar || !/^\d{12}$/.test(aadhaar)) {
+        alert("Aadhaar Card number theek 12 digits ka hona anivarya (mandatory) hai! Kripya 12-digit number check karein.");
+        if (aadhaarInput) { aadhaarInput.focus(); aadhaarInput.style.borderColor = "#ef4444"; }
+        return;
+    }
+
+    // Mandatory Player Photo Upload validation (User Requested)
+    const photoInput = document.getElementById(scope === 'standalone' ? 'standalonePhoto' : 'admPhoto');
+    if (!photoInput || !photoInput.files || !photoInput.files[0]) {
+        alert("Player passport photo upload karna anivarya (mandatory) hai! Kripya photo upload karein.");
+        if (photoInput) { photoInput.focus(); photoInput.style.borderColor = "#ef4444"; }
+        return;
+    }
+    const photoBase64 = await readFileAsBase64(photoInput.files[0]);
+
     if (!utr) {
         alert("Kripya payment complete karke UPI UTR / Transaction Reference ID zaroor bharein!");
         const utrInput = document.getElementById(scope === 'standalone' ? 'standaloneUtr' : 'admUtr');
@@ -1813,6 +1905,8 @@ function handleAdmissionRegistrationSubmit(event, scope = 'adm') {
         category: category,
         dob: dob,
         age: ageText,
+        aadhaarNumber: aadhaar,
+        photo: photoBase64,
         role: role,
         battingStyle: battingStyle,
         bowlingStyle: bowlingStyle,
@@ -1826,12 +1920,14 @@ function handleAdmissionRegistrationSubmit(event, scope = 'adm') {
         feeAmount: '1499',
         utrNumber: utr,
         paymentStatus: 'Pending Verification',
-        remarks: `RCA Admission ${category}. Father: ${fatherName}. Batting: ${battingStyle}. Bowling: ${bowlingStyle}. Fee: ₹1499. UTR: ${utr}.`,
+        remarks: `RCA Admission ${category}. Father: ${fatherName}. Batting: ${battingStyle}. Bowling: ${bowlingStyle}. Aadhaar: ${aadhaar}. Fee: ₹1499. UTR: ${utr}.`,
         formData: {
             category,
             dob,
             ageText,
             fatherName,
+            aadhaarNumber: aadhaar,
+            playerPhoto: photoBase64,
             battingStyle,
             bowlingStyle,
             utrNumber: utr,
@@ -1850,6 +1946,12 @@ function handleAdmissionRegistrationSubmit(event, scope = 'adm') {
         form.reset();
         const errEl = document.getElementById(scope === 'standalone' ? 'standalonePhoneError' : 'admPhoneError');
         if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+        const previewEl = document.getElementById(scope === 'standalone' ? 'standalonePhotoPreview' : 'admPhotoPreview');
+        if (previewEl) {
+            previewEl.style.display = 'none';
+            const img = previewEl.querySelector('img');
+            if (img) img.src = '';
+        }
     } else {
         alert("There was an issue processing your registration. Please contact Coach Chauhan directly at +91 9897517704.");
     }
@@ -1859,13 +1961,24 @@ function displayPassModal(savedBooking, headerTitle = "REGISTRATION PASS") {
     const passContainer = document.getElementById('passContainer');
     if (!passContainer) return;
 
+    const playerPhotoHtml = savedBooking.photo 
+        ? `<img src="${savedBooking.photo}" alt="Player Photo" style="width: 52px; height: 62px; object-fit: cover; border-radius: 6px; border: 2px solid var(--gold); box-shadow: 0 4px 10px rgba(0,0,0,0.5);">`
+        : '';
+
+    const formattedAadhaar = savedBooking.aadhaarNumber 
+        ? savedBooking.aadhaarNumber.replace(/(\d{4})(\d{4})(\d{4})/, '$1 $2 $3') 
+        : '';
+
     passContainer.innerHTML = `
         <div class="success-pass-header">
             <div>
                 <div style="font-size: 0.75rem; color: var(--gold-200); font-weight: 700; letter-spacing: 1px;">RAM CRICKET ACADEMY • ${headerTitle}</div>
                 <div class="pass-id">${savedBooking.id}</div>
             </div>
-            <img src="assets/images/logo.png" alt="RCA" style="width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--gold);">
+            <div style="display: flex; gap: 8px; align-items: center;">
+                ${playerPhotoHtml}
+                <img src="assets/images/logo.png" alt="RCA" style="width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--gold);">
+            </div>
         </div>
 
         <div class="pass-grid">
@@ -1873,10 +1986,17 @@ function displayPassModal(savedBooking, headerTitle = "REGISTRATION PASS") {
                 <span class="pass-label">Player Name:</span>
                 <div class="pass-value">${escapeHtml(savedBooking.name)} ${savedBooking.age && savedBooking.age !== '-' ? '(Age: ' + savedBooking.age + ')' : ''}</div>
             </div>
+            ${formattedAadhaar ? `
+            <div>
+                <span class="pass-label">Aadhaar Card No:</span>
+                <div class="pass-value" style="color: var(--gold-200); font-weight: 700; letter-spacing: 1px;"><i class="fa-solid fa-id-card" style="font-size: 0.8rem; margin-right: 4px;"></i>${escapeHtml(formattedAadhaar)}</div>
+            </div>
+            ` : `
             <div>
                 <span class="pass-label">Total Persons:</span>
                 <div class="pass-value" style="color: var(--gold-200); font-weight: 700;">${savedBooking.totalPersons || '1 Player'}</div>
             </div>
+            `}
             <div>
                 <span class="pass-label">Program / Category:</span>
                 <div class="pass-value">${savedBooking.bookingType}</div>

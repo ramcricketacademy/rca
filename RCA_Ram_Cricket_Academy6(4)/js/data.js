@@ -1924,12 +1924,14 @@ class RcaDataManager {
     getCoachWhatsAppUrl(booking) {
         const settings = this.getSettings();
         const coachPhone = settings.phone.replace(/[^0-9]/g, '');
+        const aadhaarLine = booking.aadhaarNumber ? `*Aadhaar No:* ${booking.aadhaarNumber}\n` : '';
         const text = encodeURIComponent(
             `*New Registration / Slot Booking - RCA Vrindavan*\n` +
             `-----------------------------------\n` +
             `*Booking ID:* ${booking.id}\n` +
             `*Player Name:* ${booking.name}\n` +
             `*Contact Phone:* ${booking.phone}\n` +
+            aadhaarLine +
             `*Total Persons:* ${booking.totalPersons || '1 Player'}\n` +
             `*Program / Slot:* ${booking.bookingType}\n` +
             `*Date:* ${booking.slotDate}\n` +

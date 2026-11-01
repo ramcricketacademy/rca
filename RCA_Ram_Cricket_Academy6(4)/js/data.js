@@ -29,7 +29,7 @@ const DEFAULT_SETTINGS = {
     city: "Vrindavan",
     timings: "Morning: 6:00 AM - 10:00 AM | Evening: 4:00 PM - 8:00 PM",
     googleSheetWebhookUrl: "", // Google Apps Script Webhook URL for auto-saving bookings
-    slotUtrRequired: false,    // Admin policy toggle: UTR mandatory vs optional for slot bookings
+    slotUtrRequired: true,    // Admin policy toggle: UTR mandatory vs optional for slot bookings
     admissionFee: 1499,        // Official New Joiny Academy Admission Fee (Editable by Admin)
     upiId: "ramsports6072@ybl", // Official UPI ID for Academy & Slot Payments
     aboutBio: "With dedicated grassroots coaching and match mentorship since 2018, Coach R.K. Chauhan established Ram Cricket Academy (RCA) with a mission: to provide international-standard cricket infrastructure, floodlit turf grounds, and major tournaments like RRPL 2026 and the RAM SPORTS CUP in Vrindavan.",
@@ -1064,17 +1064,31 @@ class RcaDataManager {
     }
 
     // Admin Policy: Toggle whether UTR is mandatory or optional for practice slots
+   // updateSlotUtrPolicy(isMandatory) {
+      //  const data = this.getRawData();
+        //if (!data) return false;
+        //if (!data.settings) data.settings = {};
+        //data.settings.slotUtrRequired = Boolean(isMandatory);
+        //this.saveRawData(data);
+        //if (window.rcaSupabase && window.rcaSupabase.isConfigured()) {
+          //  window.rcaSupabase.updateSettings({ slot_utr_required: Boolean(isMandatory) }).catch(e => console.warn(e));
+        //}
+        //return true;
+    //}
     updateSlotUtrPolicy(isMandatory) {
-        const data = this.getRawData();
-        if (!data) return false;
-        if (!data.settings) data.settings = {};
-        data.settings.slotUtrRequired = Boolean(isMandatory);
-        this.saveRawData(data);
-        if (window.rcaSupabase && window.rcaSupabase.isConfigured()) {
-            window.rcaSupabase.updateSettings({ slot_utr_required: Boolean(isMandatory) }).catch(e => console.warn(e));
-        }
-        return true;
+    const data = this.getRawData();
+    if (!data) return false;
+    if (!data.settings) data.settings = {};
+    data.settings.slotUtrRequired = Boolean(isMandatory);
+    this.saveRawData(data);
+    if (window.rcaSupabase && window.rcaSupabase.isConfigured()) {
+        window.rcaSupabase.updateSettings(data.settings).catch(e => console.warn(e));
     }
+    if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('rcaDataUpdated', { detail: { source: 'local', entity: 'slot_utr_policy' } }));
+    }
+    return true;
+}
 
     isSlotUtrRequired() {
         const settings = this.getSettings();

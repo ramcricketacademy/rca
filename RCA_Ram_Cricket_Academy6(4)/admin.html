@@ -1759,5 +1759,33 @@ function doPost(e) {
         </div>
     </div>
 
+    <!-- Modal: Player Photo Full Preview & Download (User Requested) -->
+    <div class="modal-backdrop" id="playerPhotoModal" style="z-index: 10000;">
+        <div class="modal-box" style="max-width: 520px; padding: 24px; text-align: center;">
+            <button class="modal-close" onclick="closeModal('playerPhotoModal')">&times;</button>
+            <div style="margin-bottom: 14px; border-bottom: 1px dashed rgba(212, 175, 55, 0.35); padding-bottom: 10px;">
+                <span class="status-pill status-Confirmed" style="font-size: 0.75rem; margin-bottom: 6px; display: inline-flex; align-items: center; gap: 5px;">
+                    <i class="fa-solid fa-id-card"></i> PLAYER IDENTITY VERIFICATION
+                </span>
+                <h3 class="brand-font" id="photoModalPlayerName" style="color: var(--admin-gold-light); margin: 4px 0 2px 0; font-size: 1.3rem;">Player Photo</h3>
+                <span id="photoModalRegId" style="font-size: 0.8rem; color: #baa3d6; font-family: monospace;"></span>
+            </div>
+
+            <!-- Full-size Image Display with Zoom / Clean Fit -->
+            <div style="background: rgba(0, 0, 0, 0.7); padding: 12px; border-radius: 12px; border: 2px solid var(--admin-gold); display: inline-block; margin-bottom: 18px; box-shadow: 0 8px 30px rgba(0,0,0,0.85);">
+                <img id="photoModalImg" src="" alt="Player Full Photo" style="max-width: 100%; max-height: 58vh; border-radius: 8px; object-fit: contain; display: block; margin: 0 auto;">
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <a id="photoDownloadBtn" href="#" download="player_photo.jpg" class="btn btn-gold" style="padding: 11px 20px; font-size: 0.92rem; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(212,175,55,0.35);">
+                    <i class="fa-solid fa-download"></i> Download Photo to Computer
+                </a>
+                <button type="button" class="btn btn-outline" onclick="closeModal('playerPhotoModal')" style="padding: 11px 20px; font-size: 0.92rem;">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
